@@ -6,7 +6,7 @@ YUI().use('test', function (Y) {
         name: 'sprite',
 
         setUp: function () {
-            this.sprite = Object.create(window.PAINTER.sprite);
+            this.sprite = Object.create(window.PONG.sprite);
             this.sprite.x = 40;
             this.sprite.y = 70;
             this.sprite.width = 10;

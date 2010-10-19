@@ -5,10 +5,10 @@
 YUI().use('node', 'io', 'json', function (Y) {
     var ms = 30;
 
-    Y.on('domready', window.PAINTER.draw);
-    Y.on('mousemove', window.PAINTER.move);
+    Y.on('domready', window.PONG.draw);
+    Y.on('mousemove', window.PONG.move);
 
     // start the game
-    window.setInterval(window.PAINTER.update, ms);
+    window.setInterval(window.PONG.update, ms);
 });
 

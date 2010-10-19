@@ -9,7 +9,7 @@ if (typeof Object.create !== 'function') {
     };
 }
 
-window.PAINTER = (function () {
+window.PONG = (function () {
     var Y,
 
         // base object for each sprite
@@ -55,7 +55,7 @@ window.PAINTER = (function () {
         sprites = {},
 
         getCanvas = function () {
-            return window.document.getElementById('painter');
+            return window.document.getElementById('pong');
         },
 
         getContext = function () {
