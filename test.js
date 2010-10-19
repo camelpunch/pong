@@ -136,13 +136,13 @@ YUI().use('test', function (Y) {
         "should stop paddle1 from leaving bottom of canvas": function () {
             var coords = [20, 700];
             window.PONG.move(coords);
-            Y.Assert.areSame(536, paddle1.y);
+            Y.Assert.areSame(472, paddle1.y);
         },
 
         "should stop paddle2 from leaving bottom of canvas": function () {
             var coords = [20, -200];
             window.PONG.move(coords);
-            Y.Assert.areSame(536, paddle2.y);
+            Y.Assert.areSame(472, paddle2.y);
         }
     });
 

@@ -116,7 +116,7 @@ window.PONG = (function () {
             x = coords[0],
             y = coords[1],
             canvas = getCanvas(),
-            lowest = canvas.height - (paddle1.height / 2);
+            lowest = canvas.height - paddle1.height;
 
             paddle1.y = y - (paddle1.height / 2);
             if (paddle1.y < 0) {
