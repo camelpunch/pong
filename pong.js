@@ -28,23 +28,19 @@ window.PONG = (function () {
             },
 
             left: function () {
-                this.leftPos = this.x - (this.width / 2);
-                return this.leftPos;
+                return this.x;
             },
 
             right: function () {
-                this.rightPos = this.x + (this.width / 2);
-                return this.rightPos;
+                return this.x + this.width;
             },
 
             top: function () {
-                this.topPos = this.y - (this.height / 2);
-                return this.topPos;
+                return this.y;
             },
 
             bottom: function () {
-                this.bottomPos = this.y + (this.height / 2);
-                return this.bottomPos;
+                return this.y + this.height;
             }
         },
 
@@ -112,24 +108,33 @@ window.PONG = (function () {
             draw();
         },
         
-        // set new positions given mouse movement
-        move = function (e) {
-            var paddle1 = sprites.paddle1,
-                paddle2 = sprites.paddle2;
+        // set new positions given coords of cursor
+        move = function (coords) {
+            var 
+            paddle1 = sprites.paddle1,
+            paddle2 = sprites.paddle2,
+            x = coords[0],
+            y = coords[1],
+            canvas = getCanvas(),
+            lowest = canvas.height - (paddle1.height / 2);
 
-            clear();
-
-            paddle1.y = e.clientY - (paddle1.height / 2);
+            paddle1.y = y - (paddle1.height / 2);
             if (paddle1.y < 0) {
                 paddle1.y = 0;
             }
 
-            paddle2.y = 600 - e.clientY - (paddle2.height / 2);
+            if (paddle1.y > lowest) {
+                paddle1.y = lowest;
+            }
+
+            paddle2.y = 600 - y - (paddle2.height / 2);
             if (paddle2.y < 0) {
                 paddle2.y = 0;
             }
 
-            draw();
+            if (paddle2.y > lowest) {
+                paddle2.y = lowest;
+            }
         };
 
     // paddles
@@ -161,6 +166,7 @@ window.PONG = (function () {
         // objects used privately, also available publicly
         sprite: sprite,
         sprites: sprites,
+        clear: clear,
         draw: draw,
         update: update,
         move: move
