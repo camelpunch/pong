@@ -2,7 +2,7 @@
 "use strict";
 
 // instantiation
-YUI().use('node', 'io', 'json', function (Y) {
+YUI().use('node', function (Y) {
     var ms = 30;
 
     Y.on('domready', window.PONG.draw);
