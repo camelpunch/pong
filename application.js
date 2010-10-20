@@ -2,7 +2,7 @@
 "use strict";
 
 YUI().use('node', function (Y) {
-    var ms = 30;
+    var ms = 20;
 
     Y.on('domready', function () {
         PONG.draw(PONG.sprites);
