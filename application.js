@@ -6,13 +6,15 @@ YUI().use('node', function (Y) {
     var ms = 30,
     pong = window.PONG;
 
-    Y.on('domready', window.PONG.draw);
+    Y.on('domready', function () {
+        window.PONG.draw(window.PONG.sprites);
+    });
 
     Y.on('mousemove', function (e) {
         var coords = [e.clientX, e.clientY];
         pong.clear();
         pong.move(coords);
-        pong.draw();
+        pong.draw(window.PONG.sprites);
     });
 
     // game loop

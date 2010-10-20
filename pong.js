@@ -59,14 +59,14 @@ window.PONG = (function () {
         },
 
         // draw new positions of sprites
-        draw = function () {
-            var c = getContext(),
+        draw = function (spritesToDraw, context) {
+            var c = context ? context : getContext(),
                 key,
                 sprite;
 
-            for (key in sprites) {
-                if (sprites.hasOwnProperty(key)) {
-                    sprite = sprites[key];
+            for (key in spritesToDraw) {
+                if (spritesToDraw.hasOwnProperty(key)) {
+                    sprite = spritesToDraw[key];
                     c.fillStyle = sprite.fillStyle;
                     c.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
                 }
@@ -105,7 +105,7 @@ window.PONG = (function () {
                 ball.reverse();
             }
 
-            draw();
+            draw(sprites);
         },
         
         // set new positions given coords of cursor

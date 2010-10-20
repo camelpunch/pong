@@ -65,23 +65,60 @@ YUI().use('test', function (Y) {
 
         setUp: function () {
             var mario = Object.create(window.PONG.sprite),
-            luigi = Object.create(window.PONG.sprite);
+            luigi = Object.create(window.PONG.sprite),
+            context;
+
+            this.sprites = {};
 
             mario.width = 30;
             mario.height = 30;
             mario.x = 30;
             mario.y = 400;
+            mario.fillStyle = 'red';
 
             luigi.width = 30;
             luigi.height = 40;
             luigi.x = 70;
             luigi.y = 400;
+            luigi.fillStyle = 'green';
 
             this.sprites.mario = mario;
             this.sprites.luigi = luigi;
 
-            this.context = {
+            context = {
+                argsReceived: [],
+                fillRect: function () {
+                    var slice = Array.prototype.slice,
+                    args = slice.apply(arguments);
+                    context.argsReceived.push(args);
+                }
             };
+
+            this.context = context;
+        },
+
+        "should set the fillStyle from the sprite property": function () {
+            window.PONG.draw(this.sprites, this.context);
+            // can expect the last set fillStyle to be green
+            Y.Assert.areSame('green', this.context.fillStyle);
+        },
+
+        "should draw a rectangle with each sprite's dimensions": function () {
+            var first = {}, 
+            second = {},
+            arg;
+
+            window.PONG.draw(this.sprites, this.context);
+
+            Y.Assert.areSame(this.sprites.mario.x, this.context.argsReceived[0][0]);
+            Y.Assert.areSame(this.sprites.mario.y,  this.context.argsReceived[0][1]);
+            Y.Assert.areSame(this.sprites.mario.width, this.context.argsReceived[0][2]);
+            Y.Assert.areSame(this.sprites.mario.height, this.context.argsReceived[0][3]);
+
+            Y.Assert.areSame(this.sprites.luigi.x, this.context.argsReceived[1][0]);
+            Y.Assert.areSame(this.sprites.luigi.y, this.context.argsReceived[1][1]);
+            Y.Assert.areSame(this.sprites.luigi.width, this.context.argsReceived[1][2]);
+            Y.Assert.areSame(this.sprites.luigi.height, this.context.argsReceived[1][3]);
         }
     }),
 
@@ -95,58 +132,58 @@ YUI().use('test', function (Y) {
                     }
                 };
             };
+
+            this.paddle1 = window.PONG.sprites.paddle1;
+            this.paddle2 = window.PONG.sprites.paddle2;
         },
 
         "should set paddle1 y central to cursor": function () {
             var coords = [20, 400];
 
-            paddle1 = window.PONG.sprites.paddle1;
-
-            Y.Assert.areSame(128, paddle1.height);
+            Y.Assert.areSame(128, this.paddle1.height);
 
             window.PONG.move(coords);
 
-            Y.Assert.areSame(336, paddle1.y);
+            Y.Assert.areSame(336, this.paddle1.y);
         },
 
         "should set paddle2 y opposite": function () {
             var coords = [20, 400];
 
-            paddle2 = window.PONG.sprites.paddle2;
-
-            Y.Assert.areSame(128, paddle2.height);
+            Y.Assert.areSame(128, this.paddle2.height);
 
             window.PONG.move(coords);
 
-            Y.Assert.areSame(136, paddle2.y);
+            Y.Assert.areSame(136, this.paddle2.y);
         },
 
         "should stop paddle1 from leaving top of canvas": function () {
             var coords = [20, -10];
             window.PONG.move(coords);
-            Y.Assert.areSame(0, paddle1.y);
+            Y.Assert.areSame(0, this.paddle1.y);
         },
 
         "should stop paddle2 from leaving top of canvas": function () {
             var coords = [20, 900];
             window.PONG.move(coords);
-            Y.Assert.areSame(0, paddle2.y);
+            Y.Assert.areSame(0, this.paddle2.y);
         },
 
         "should stop paddle1 from leaving bottom of canvas": function () {
             var coords = [20, 700];
             window.PONG.move(coords);
-            Y.Assert.areSame(472, paddle1.y);
+            Y.Assert.areSame(472, this.paddle1.y);
         },
 
         "should stop paddle2 from leaving bottom of canvas": function () {
             var coords = [20, -200];
             window.PONG.move(coords);
-            Y.Assert.areSame(472, paddle2.y);
+            Y.Assert.areSame(472, this.paddle2.y);
         }
     });
 
     Y.Test.Runner.add(sprite);
     Y.Test.Runner.add(move);
+    Y.Test.Runner.add(draw);
     Y.Test.Runner.run();
 });
