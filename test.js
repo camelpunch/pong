@@ -23,38 +23,36 @@ YUI().use('test', function (Y) {
             this.ball.height = 5;
         },
 
-        "left should be x position": function () {
-            Y.Assert.areSame(40, this.sprite.left());
+        "place should set left to be x position": function () {
+            this.sprite.place(50, 50);
+            Y.Assert.areSame(50, this.sprite.left);
         },
 
-        "right should be x position plus width": function () {
-            Y.Assert.areSame(50, this.sprite.right());
+        "place should set right to be x position plus width": function () {
+            this.sprite.place(50, 50);
+            Y.Assert.areSame(60, this.sprite.right);
         },
 
-        "top should be y position": function () {
-            Y.Assert.areSame(70, this.sprite.top());
+        "place should set top to be y position": function () {
+            this.sprite.place(50, 50);
+            Y.Assert.areSame(50, this.sprite.top);
         },
 
         "bottom should be y position plus height": function () {
-            Y.Assert.areSame(100, this.sprite.bottom());
+            this.sprite.place(50, 50);
+            Y.Assert.areSame(80, this.sprite.bottom);
         },
 
         "hits should be true when ball LHS over bat RHS": function () {
-            this.bat.y = 50;
-            this.ball.y = 50;
-
-            this.bat.x = 0;
-            this.ball.x = 9;
+            this.bat.place(0, 50);
+            this.ball.place(9, 50);
 
             Y.assert(this.bat.hits(this.ball));
         },
 
         "hits should be false when ball RHS not over bat LHS": function () {
-            this.bat.y = 50;
-            this.ball.y = 50;
-
-            this.bat.x = 0;
-            this.ball.x = 11;
+            this.bat.place(0, 50);
+            this.ball.place(11, 50);
 
             Y.Assert.isFalse(this.bat.hits(this.ball));
         }
@@ -85,12 +83,13 @@ YUI().use('test', function (Y) {
         setUp: function () {
             this.ball = PONG.sprites.ball;
             this.ball.x = 53;
+            this.ball.left = 53;
             this.ball.xPixelsPerTick = 5;
         },
 
-        "move should increase x by xPixelsPerTick": function () {
+        "move should increase left by xPixelsPerTick": function () {
             this.ball.move();
-            Y.Assert.areSame(58, this.ball.x);
+            Y.Assert.areSame(58, this.ball.left);
         },
 
         "reverseX should switch polarity of xPixelsPerTick": function () {

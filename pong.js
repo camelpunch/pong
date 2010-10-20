@@ -18,29 +18,22 @@ window.PONG = (function () {
         fillStyle: 'black',
 
         hits: function (other) {
-            if (this.bottom() < other.top() ||
-                this.top() > other.bottom() ||
-                this.right() < other.left() ||
-                this.left() > other.right()) {
-                return false;
-            }
-            return true;
+            return !(
+                this.bottom < other.top ||
+                this.top > other.bottom ||
+                this.right < other.left ||
+                this.left > other.right
+            );
         },
 
-        left: function () {
-            return this.x;
-        },
-
-        right: function () {
-            return this.x + this.width;
-        },
-
-        top: function () {
-            return this.y;
-        },
-
-        bottom: function () {
-            return this.y + this.height;
+        place: function (x, y) {
+            this.x = x;
+            this.y = y;
+            this.left = x;
+            this.right = this.width + x;
+            this.top = y;
+            this.bottom = this.height + y;
+            return this;
         }
     },
 
@@ -121,14 +114,12 @@ window.PONG = (function () {
     paddle.setY = function (y) {
         var lowest = canvas.height - this.height;
 
-        this.y = y;
-
-        if (this.y < 0) {
-            this.y = 0;
-        }
-
-        if (this.y > lowest) {
-            this.y = lowest;
+        if (y < 0) {
+            this.place(this.x, 0);
+        } else if (y > lowest) {
+            this.place(this.x, lowest);
+        } else {
+            this.place(this.x, y);
         }
 
         return this;
@@ -145,14 +136,14 @@ window.PONG = (function () {
     sprites.ball = Object.create(sprite);
     sprites.ball.xPixelsPerTick = 10;
     sprites.ball.move = function () {
-        this.x += this.xPixelsPerTick;
+        this.place(this.x + this.xPixelsPerTick, this.y);
     };
     sprites.ball.reverseX = function () {
         this.xPixelsPerTick = 0 - this.xPixelsPerTick;
     };
     sprites.ball.width = 32;
     sprites.ball.height = 32;
-    sprites.ball.x = sprites.paddle1.x + sprites.paddle1.width;
+    sprites.ball.place(sprites.paddle1.x + sprites.paddle1.width, 0);
 
     return {
         // objects used privately, also available publicly
