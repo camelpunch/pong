@@ -10,10 +10,8 @@ if (typeof Object.create !== 'function') {
 }
 
 window.PONG = (function () {
-    var Y,
-
-        // base object for each sprite
-        sprite = {
+    // base object for each sprite
+    var sprite = {
             y: 0,
             fillStyle: 'black',
 
