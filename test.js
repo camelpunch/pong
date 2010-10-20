@@ -195,12 +195,39 @@ YUI().use('test', function (Y) {
 
             Y.Assert.areSame(136, this.paddle2.y);
         }
+    }),
+        
+    update = new Y.Test.Case({
+        setUp: function () {
+            this.ball = PONG.sprites.ball;
+
+            this.paddle1 = PONG.sprites.paddle1;
+            this.paddle1.place(0, 0);
+
+            this.paddle2 = PONG.sprites.paddle2;
+            this.paddle2.place(568, 0);
+        },
+
+        "should reverse ball horizontally when it hits paddle1": function () {
+            this.ball.xPixelsPerTick = -5;
+            this.ball.place(5, 0);
+            PONG.update();
+            Y.Assert.areSame(5, this.ball.xPixelsPerTick);
+        },
+
+        "should reverse ball horizontally when it hits paddle2": function () {
+            this.ball.xPixelsPerTick = 5;
+            this.ball.place(595, 0);
+            PONG.update();
+            Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
+        }
     });
 
-    Y.Test.Runner.add(sprite);
-    Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(ball);
-    Y.Test.Runner.add(move);
     Y.Test.Runner.add(draw);
+    Y.Test.Runner.add(move);
+    Y.Test.Runner.add(paddle);
+    Y.Test.Runner.add(sprite);
+    Y.Test.Runner.add(update);
     Y.Test.Runner.run();
 });

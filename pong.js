@@ -86,11 +86,7 @@ window.PONG = (function () {
 
         ball.move();
 
-        if (ball.hits(paddle2)) {
-            ball.reverseX();
-        }
-
-        if (ball.hits(paddle1)) {
+        if (ball.hits(paddle1) || ball.hits(paddle2)) {
             ball.reverseX();
         }
 
