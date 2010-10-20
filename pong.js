@@ -110,37 +110,35 @@ window.PONG = (function () {
         
         // set new positions given coords of cursor
         move = function (coords) {
-            var 
-            paddle1 = sprites.paddle1,
+            var paddle1 = sprites.paddle1,
             paddle2 = sprites.paddle2,
-            x = coords[0],
             y = coords[1],
-            canvas = getCanvas(),
-            lowest = canvas.height - paddle1.height;
+            canvas = getCanvas();
 
-            paddle1.y = y - (paddle1.height / 2);
-            if (paddle1.y < 0) {
-                paddle1.y = 0;
-            }
-
-            if (paddle1.y > lowest) {
-                paddle1.y = lowest;
-            }
-
-            paddle2.y = 600 - y - (paddle2.height / 2);
-            if (paddle2.y < 0) {
-                paddle2.y = 0;
-            }
-
-            if (paddle2.y > lowest) {
-                paddle2.y = lowest;
-            }
+            paddle1.setY(y - (paddle1.height / 2));
+            paddle2.setY(canvas.height - y - (paddle2.height / 2));
         };
 
     // paddles
     paddle = Object.create(sprite);
     paddle.width = 32;
     paddle.height = 128;
+    paddle.setY = function (y) {
+        var canvas = getCanvas(),
+        lowest = canvas.height - this.height;
+
+        this.y = y;
+
+        if (this.y < 0) {
+            this.y = 0;
+        }
+
+        if (this.y > lowest) {
+            this.y = lowest;
+        }
+
+        return this;
+    };
 
     sprites.paddle1 = Object.create(paddle);
     sprites.paddle1.x = 10;
@@ -165,6 +163,7 @@ window.PONG = (function () {
     return {
         // objects used privately, also available publicly
         sprite: sprite,
+        paddle: paddle,
         sprites: sprites,
         clear: clear,
         draw: draw,

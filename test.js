@@ -60,6 +60,25 @@ YUI().use('test', function (Y) {
         }
     }),
 
+    paddle = new Y.Test.Case({
+        name: 'paddle',
+
+        setUp: function () {
+            this.paddle = Object.create(PONG.paddle);
+            this.paddle.height = 100;
+        },
+
+        "setY should stop paddle from leaving top of canvas": function () {
+            this.paddle.setY(-10);
+            Y.Assert.areSame(0, this.paddle.y);
+        },
+
+        "setY should stop paddle from leaving bottom of canvas": function () {
+            this.paddle.setY(601);
+            Y.Assert.areSame(500, this.paddle.y);
+        }
+    }),
+
     draw = new Y.Test.Case({
         name: 'draw',
 
@@ -148,34 +167,11 @@ YUI().use('test', function (Y) {
             PONG.move(coords);
 
             Y.Assert.areSame(136, this.paddle2.y);
-        },
-
-        "should stop paddle1 from leaving top of canvas": function () {
-            var coords = [20, -10];
-            PONG.move(coords);
-            Y.Assert.areSame(0, this.paddle1.y);
-        },
-
-        "should stop paddle2 from leaving top of canvas": function () {
-            var coords = [20, 900];
-            PONG.move(coords);
-            Y.Assert.areSame(0, this.paddle2.y);
-        },
-
-        "should stop paddle1 from leaving bottom of canvas": function () {
-            var coords = [20, 700];
-            PONG.move(coords);
-            Y.Assert.areSame(472, this.paddle1.y);
-        },
-
-        "should stop paddle2 from leaving bottom of canvas": function () {
-            var coords = [20, -200];
-            PONG.move(coords);
-            Y.Assert.areSame(472, this.paddle2.y);
         }
     });
 
     Y.Test.Runner.add(sprite);
+    Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(draw);
     Y.Test.Runner.run();
