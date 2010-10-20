@@ -1,7 +1,6 @@
 /*global window, YUI */
 "use strict";
 
-// instantiation
 YUI().use('node', function (Y) {
     var ms = 30,
     pong = window.PONG;
