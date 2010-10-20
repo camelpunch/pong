@@ -126,13 +126,6 @@ YUI().use('test', function (Y) {
         name: 'move',
 
         setUp: function () {
-            window.getCanvas = function () {
-                return {
-                    getContext: function () {
-                    }
-                };
-            };
-
             this.paddle1 = PONG.sprites.paddle1;
             this.paddle2 = PONG.sprites.paddle2;
         },
