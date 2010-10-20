@@ -11,119 +11,115 @@ if (typeof Object.create !== 'function') {
 
 window.PONG = (function () {
     // base object for each sprite
-    var sprite = {
-            y: 0,
-            fillStyle: 'black',
+    var canvas = window.document.getElementById('pong'),
+    
+    sprite = {
+        y: 0,
+        fillStyle: 'black',
 
-            hits: function (other) {
-                if (this.bottom() < other.top() ||
-                    this.top() > other.bottom() ||
-                    this.right() < other.left() ||
-                    this.left() > other.right()) {
-                    return false;
-                }
-                return true;
-            },
-
-            left: function () {
-                return this.x;
-            },
-
-            right: function () {
-                return this.x + this.width;
-            },
-
-            top: function () {
-                return this.y;
-            },
-
-            bottom: function () {
-                return this.y + this.height;
+        hits: function (other) {
+            if (this.bottom() < other.top() ||
+                this.top() > other.bottom() ||
+                this.right() < other.left() ||
+                this.left() > other.right()) {
+                return false;
             }
+            return true;
         },
 
-        // base for each paddle
-        paddle,
-
-        // container for sprites
-        sprites = {},
-
-        getCanvas = function () {
-            return window.document.getElementById('pong');
+        left: function () {
+            return this.x;
         },
 
-        getContext = function () {
-            return getCanvas().getContext('2d');
+        right: function () {
+            return this.x + this.width;
         },
 
-        // draw new positions of sprites
-        draw = function (spritesToDraw, context) {
-            var c = context ? context : getContext(),
-                key,
-                sprite;
+        top: function () {
+            return this.y;
+        },
 
-            for (key in spritesToDraw) {
-                if (spritesToDraw.hasOwnProperty(key)) {
-                    sprite = spritesToDraw[key];
-                    c.fillStyle = sprite.fillStyle;
-                    c.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
-                }
+        bottom: function () {
+            return this.y + this.height;
+        }
+    },
+
+    // base for each paddle
+    paddle,
+
+    // container for sprites
+    sprites = {},
+
+    getContext = function () {
+        return canvas.getContext('2d');
+    },
+
+    // draw new positions of sprites
+    draw = function (spritesToDraw, context) {
+        var c = context ? context : getContext(),
+            key,
+            sprite;
+
+        for (key in spritesToDraw) {
+            if (spritesToDraw.hasOwnProperty(key)) {
+                sprite = spritesToDraw[key];
+                c.fillStyle = sprite.fillStyle;
+                c.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
             }
-        },
+        }
+    },
 
-        // clear old positions of sprites
-        clear = function () {
-            var c = getContext(),
-                key,
-                sprite;
+    // clear old positions of sprites
+    clear = function () {
+        var c = getContext(),
+            key,
+            sprite;
 
-            for (key in sprites) {
-                if (sprites.hasOwnProperty(key)) {
-                    sprite = sprites[key];
-                    c.clearRect(sprite.x, sprite.y, sprite.width, sprite.height);
-                }
+        for (key in sprites) {
+            if (sprites.hasOwnProperty(key)) {
+                sprite = sprites[key];
+                c.clearRect(sprite.x, sprite.y, sprite.width, sprite.height);
             }
-        },
+        }
+    },
 
-        // update the game without user interaction
-        update = function () {
-            var ball = sprites.ball,
-                paddle1 = sprites.paddle1,
-                paddle2 = sprites.paddle2;
+    // update the game without user interaction
+    update = function () {
+        var ball = sprites.ball,
+            paddle1 = sprites.paddle1,
+            paddle2 = sprites.paddle2;
 
-            clear();
+        clear();
 
-            ball.move();
+        ball.move();
 
-            if (ball.hits(paddle2)) {
-                ball.reverse();
-            }
+        if (ball.hits(paddle2)) {
+            ball.reverse();
+        }
 
-            if (ball.hits(paddle1)) {
-                ball.reverse();
-            }
+        if (ball.hits(paddle1)) {
+            ball.reverse();
+        }
 
-            draw(sprites);
-        },
-        
-        // set new positions given coords of cursor
-        move = function (coords) {
-            var paddle1 = sprites.paddle1,
-            paddle2 = sprites.paddle2,
-            y = coords[1],
-            canvas = getCanvas();
+        draw(sprites);
+    },
+    
+    // set new positions given coords of cursor
+    move = function (coords) {
+        var paddle1 = sprites.paddle1,
+        paddle2 = sprites.paddle2,
+        y = coords[1];
 
-            paddle1.setY(y - (paddle1.height / 2));
-            paddle2.setY(canvas.height - y - (paddle2.height / 2));
-        };
+        paddle1.setY(y - (paddle1.height / 2));
+        paddle2.setY(canvas.height - y - (paddle2.height / 2));
+    };
 
     // paddles
     paddle = Object.create(sprite);
     paddle.width = 32;
     paddle.height = 128;
     paddle.setY = function (y) {
-        var canvas = getCanvas(),
-        lowest = canvas.height - this.height;
+        var lowest = canvas.height - this.height;
 
         this.y = y;
 
@@ -143,7 +139,7 @@ window.PONG = (function () {
         
     sprites.paddle2 = Object.create(paddle);
     sprites.paddle2.x = 700;
-    sprites.paddle2.y = 600 - (sprites.paddle2.height / 2);
+    sprites.paddle2.y = canvas.height - (sprites.paddle2.height / 2);
 
     // ball
     sprites.ball = Object.create(sprite);
