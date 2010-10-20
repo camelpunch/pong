@@ -1,4 +1,4 @@
-/*global window, YUI */
+/*global window, YUI, PONG */
 "use strict";
 
 YUI().use('test', function (Y) {
@@ -6,7 +6,7 @@ YUI().use('test', function (Y) {
         name: 'sprite',
 
         setUp: function () {
-            this.sprite = Object.create(window.PONG.sprite);
+            this.sprite = Object.create(PONG.sprite);
             this.sprite.x = 40;
             this.sprite.y = 70;
             this.sprite.width = 10;
@@ -64,8 +64,8 @@ YUI().use('test', function (Y) {
         name: 'draw',
 
         setUp: function () {
-            var mario = Object.create(window.PONG.sprite),
-            luigi = Object.create(window.PONG.sprite),
+            var mario = Object.create(PONG.sprite),
+            luigi = Object.create(PONG.sprite),
             context;
 
             this.sprites = {};
@@ -98,7 +98,7 @@ YUI().use('test', function (Y) {
         },
 
         "should set the fillStyle from the sprite property": function () {
-            window.PONG.draw(this.sprites, this.context);
+            PONG.draw(this.sprites, this.context);
             // can expect the last set fillStyle to be green
             Y.Assert.areSame('green', this.context.fillStyle);
         },
@@ -108,7 +108,7 @@ YUI().use('test', function (Y) {
             second = {},
             arg;
 
-            window.PONG.draw(this.sprites, this.context);
+            PONG.draw(this.sprites, this.context);
 
             Y.Assert.areSame(this.sprites.mario.x, this.context.argsReceived[0][0]);
             Y.Assert.areSame(this.sprites.mario.y,  this.context.argsReceived[0][1]);
@@ -133,8 +133,8 @@ YUI().use('test', function (Y) {
                 };
             };
 
-            this.paddle1 = window.PONG.sprites.paddle1;
-            this.paddle2 = window.PONG.sprites.paddle2;
+            this.paddle1 = PONG.sprites.paddle1;
+            this.paddle2 = PONG.sprites.paddle2;
         },
 
         "should set paddle1 y central to cursor": function () {
@@ -142,7 +142,7 @@ YUI().use('test', function (Y) {
 
             Y.Assert.areSame(128, this.paddle1.height);
 
-            window.PONG.move(coords);
+            PONG.move(coords);
 
             Y.Assert.areSame(336, this.paddle1.y);
         },
@@ -152,32 +152,32 @@ YUI().use('test', function (Y) {
 
             Y.Assert.areSame(128, this.paddle2.height);
 
-            window.PONG.move(coords);
+            PONG.move(coords);
 
             Y.Assert.areSame(136, this.paddle2.y);
         },
 
         "should stop paddle1 from leaving top of canvas": function () {
             var coords = [20, -10];
-            window.PONG.move(coords);
+            PONG.move(coords);
             Y.Assert.areSame(0, this.paddle1.y);
         },
 
         "should stop paddle2 from leaving top of canvas": function () {
             var coords = [20, 900];
-            window.PONG.move(coords);
+            PONG.move(coords);
             Y.Assert.areSame(0, this.paddle2.y);
         },
 
         "should stop paddle1 from leaving bottom of canvas": function () {
             var coords = [20, 700];
-            window.PONG.move(coords);
+            PONG.move(coords);
             Y.Assert.areSame(472, this.paddle1.y);
         },
 
         "should stop paddle2 from leaving bottom of canvas": function () {
             var coords = [20, -200];
-            window.PONG.move(coords);
+            PONG.move(coords);
             Y.Assert.areSame(472, this.paddle2.y);
         }
     });

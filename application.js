@@ -1,22 +1,21 @@
-/*global window, YUI */
+/*global window, YUI, PONG */
 "use strict";
 
 YUI().use('node', function (Y) {
-    var ms = 30,
-    pong = window.PONG;
+    var ms = 30;
 
     Y.on('domready', function () {
-        window.PONG.draw(window.PONG.sprites);
+        PONG.draw(PONG.sprites);
     });
 
     Y.on('mousemove', function (e) {
         var coords = [e.clientX, e.clientY];
-        pong.clear();
-        pong.move(coords);
-        pong.draw(window.PONG.sprites);
+        PONG.clear();
+        PONG.move(coords);
+        PONG.draw(PONG.sprites);
     });
 
     // game loop
-    window.setInterval(pong.update, ms);
+    window.setInterval(PONG.update, ms);
 });
 
