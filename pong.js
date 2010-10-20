@@ -135,8 +135,9 @@ window.PONG = (function () {
     // ball
     sprites.ball = Object.create(sprite);
     sprites.ball.xPixelsPerTick = 10;
+    sprites.ball.yPixelsPerTick = 11;
     sprites.ball.move = function () {
-        this.place(this.x + this.xPixelsPerTick, this.y);
+        this.place(this.x + this.xPixelsPerTick, this.y + this.yPixelsPerTick);
     };
     sprites.ball.reverseX = function () {
         this.xPixelsPerTick = 0 - this.xPixelsPerTick;

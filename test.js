@@ -84,12 +84,20 @@ YUI().use('test', function (Y) {
             this.ball = PONG.sprites.ball;
             this.ball.x = 53;
             this.ball.left = 53;
+            this.ball.y = 30;
+            this.ball.top = 30;
             this.ball.xPixelsPerTick = 5;
+            this.ball.yPixelsPerTick = 6;
         },
 
         "move should increase left by xPixelsPerTick": function () {
             this.ball.move();
             Y.Assert.areSame(58, this.ball.left);
+        },
+
+        "move should increase top by yPixelsPerTick": function () {
+            this.ball.move();
+            Y.Assert.areSame(36, this.ball.top);
         },
 
         "reverseX should switch polarity of xPixelsPerTick": function () {
