@@ -139,7 +139,7 @@ window.PONG = (function () {
         
     sprites.paddle2 = Object.create(paddle);
     sprites.paddle2.x = 700;
-    sprites.paddle2.y = canvas.height - (sprites.paddle2.height / 2);
+    sprites.paddle2.y = canvas.height - sprites.paddle2.height;
 
     // ball
     sprites.ball = Object.create(sprite);
