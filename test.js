@@ -232,6 +232,13 @@ YUI().use('test', function (Y) {
             this.ball.place(0, 595);
             PONG.update();
             Y.Assert.areSame(-5, this.ball.yPixelsPerTick);
+        },
+
+        "should reverse ball vertically when it hits top": function () {
+            this.ball.yPixelsPerTick = -5;
+            this.ball.place(0, 0);
+            PONG.update();
+            Y.Assert.areSame(5, this.ball.yPixelsPerTick);
         }
     });
 

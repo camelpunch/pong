@@ -83,8 +83,14 @@ window.PONG = (function () {
             // no need to define left and right, as they should never be
             // evaluated
             bottom = {
-                top: canvas.height,
-                bottom: canvas.height
+                top: canvas.height
+            },
+
+            // no need to define left and right, as they should never be
+            // evaluated
+            top = {
+                top: 0,
+                bottom: 0
             },
 
             paddle1 = sprites.paddle1,
@@ -98,7 +104,7 @@ window.PONG = (function () {
             ball.reverseX();
         }
 
-        if (ball.hits(bottom)) {
+        if (ball.hits(bottom) || ball.hits(top)) {
             ball.reverseY();
         }
 
