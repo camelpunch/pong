@@ -79,6 +79,14 @@ window.PONG = (function () {
     // update the game without user interaction
     update = function () {
         var ball = sprites.ball,
+
+            // no need to define left and right, as they should never be
+            // evaluated
+            bottom = {
+                top: canvas.height,
+                bottom: canvas.height
+            },
+
             paddle1 = sprites.paddle1,
             paddle2 = sprites.paddle2;
 
@@ -88,6 +96,10 @@ window.PONG = (function () {
 
         if (ball.hits(paddle1) || ball.hits(paddle2)) {
             ball.reverseX();
+        }
+
+        if (ball.hits(bottom)) {
+            ball.reverseY();
         }
 
         draw(sprites);
@@ -122,11 +134,10 @@ window.PONG = (function () {
     };
 
     sprites.paddle1 = Object.create(paddle);
-    sprites.paddle1.x = 10;
+    sprites.paddle1.place(10, 0);
         
     sprites.paddle2 = Object.create(paddle);
-    sprites.paddle2.x = 700;
-    sprites.paddle2.y = canvas.height - sprites.paddle2.height;
+    sprites.paddle2.place(700, canvas.height - sprites.paddle2.height);
 
     // ball
     sprites.ball = Object.create(sprite);
@@ -138,9 +149,12 @@ window.PONG = (function () {
     sprites.ball.reverseX = function () {
         this.xPixelsPerTick = 0 - this.xPixelsPerTick;
     };
+    sprites.ball.reverseY = function () {
+        this.yPixelsPerTick = 0 - this.yPixelsPerTick;
+    };
     sprites.ball.width = 32;
     sprites.ball.height = 32;
-    sprites.ball.place(sprites.paddle1.x + sprites.paddle1.width, 0);
+    sprites.ball.place(sprites.paddle1.right, 0);
 
     return {
         // objects used privately, also available publicly

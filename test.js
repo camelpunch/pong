@@ -103,6 +103,11 @@ YUI().use('test', function (Y) {
         "reverseX should switch polarity of xPixelsPerTick": function () {
             this.ball.reverseX();
             Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
+        },
+
+        "reverseY should switch polarity of yPixelsPerTick": function () {
+            this.ball.reverseY();
+            Y.Assert.areSame(-6, this.ball.yPixelsPerTick);
         }
     }),
 
@@ -220,6 +225,13 @@ YUI().use('test', function (Y) {
             this.ball.place(595, 0);
             PONG.update();
             Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
+        },
+
+        "should reverse ball vertically when it hits bottom": function () {
+            this.ball.yPixelsPerTick = 5;
+            this.ball.place(0, 595);
+            PONG.update();
+            Y.Assert.areSame(-5, this.ball.yPixelsPerTick);
         }
     });
 
