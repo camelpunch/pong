@@ -147,12 +147,12 @@ window.PONG = (function () {
 
     // ball
     sprites.ball = Object.create(sprite);
-    sprites.ball.pixelsPerTick = 10;
+    sprites.ball.xPixelsPerTick = 10;
     sprites.ball.move = function () {
-        this.x += this.pixelsPerTick;
+        this.x += this.xPixelsPerTick;
     };
     sprites.ball.reverse = function () {
-        this.pixelsPerTick = 0 - this.pixelsPerTick;
+        this.xPixelsPerTick = 0 - this.xPixelsPerTick;
     };
     sprites.ball.width = 32;
     sprites.ball.height = 32;
