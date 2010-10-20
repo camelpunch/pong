@@ -94,11 +94,11 @@ window.PONG = (function () {
         ball.move();
 
         if (ball.hits(paddle2)) {
-            ball.reverse();
+            ball.reverseX();
         }
 
         if (ball.hits(paddle1)) {
-            ball.reverse();
+            ball.reverseX();
         }
 
         draw(sprites);
@@ -147,7 +147,7 @@ window.PONG = (function () {
     sprites.ball.move = function () {
         this.x += this.xPixelsPerTick;
     };
-    sprites.ball.reverse = function () {
+    sprites.ball.reverseX = function () {
         this.xPixelsPerTick = 0 - this.xPixelsPerTick;
     };
     sprites.ball.width = 32;

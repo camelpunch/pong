@@ -93,8 +93,8 @@ YUI().use('test', function (Y) {
             Y.Assert.areSame(58, this.ball.x);
         },
 
-        "reverse should switch polarity of xPixelsPerTick": function () {
-            this.ball.reverse();
+        "reverseX should switch polarity of xPixelsPerTick": function () {
+            this.ball.reverseX();
             Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
         }
     }),
