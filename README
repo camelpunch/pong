@@ -1,0 +1,12 @@
+This is an as-yet-unfinished PONG clone written in JavaScript for browsers
+supporting Canvas.
+
+Its aims are:
+
+* Be JSLint friendly (http://www.jslint.com/)
+* Be well tested with YUI Test
+* End up with a separate game library for similarly simplistic games
+
+To run the tests, clone the project somewhere and visit test.html in your
+browser. Look at the console for test output.
+
