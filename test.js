@@ -79,6 +79,26 @@ YUI().use('test', function (Y) {
         }
     }),
 
+    ball = new Y.Test.Case({
+        name: 'ball',
+
+        setUp: function () {
+            this.ball = PONG.sprites.ball;
+            this.ball.x = 53;
+            this.ball.pixelsPerTick = 5;
+        },
+
+        "move should increase x by pixelsPerTick": function () {
+            this.ball.move();
+            Y.Assert.areSame(58, this.ball.x);
+        },
+
+        "reverse should switch polarity of pixelsPerTick": function () {
+            this.ball.reverse();
+            Y.Assert.areSame(-5, this.ball.pixelsPerTick);
+        }
+    }),
+
     draw = new Y.Test.Case({
         name: 'draw',
 
@@ -172,6 +192,7 @@ YUI().use('test', function (Y) {
 
     Y.Test.Runner.add(sprite);
     Y.Test.Runner.add(paddle);
+    Y.Test.Runner.add(ball);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(draw);
     Y.Test.Runner.run();
