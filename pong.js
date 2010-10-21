@@ -12,6 +12,7 @@ if (typeof Object.create !== 'function') {
 window.PONG = (function () {
     // base object for each sprite
     var canvas = window.document.getElementById('pong'),
+    context = canvas.getContext('2d'),
     
     sprite = {
         fillStyle: 'black',
@@ -42,13 +43,9 @@ window.PONG = (function () {
     // container for sprites
     sprites = {},
 
-    getContext = function () {
-        return canvas.getContext('2d');
-    },
-
     // draw new positions of sprites
-    draw = function (spritesToDraw, context) {
-        var c = context ? context : getContext(),
+    draw = function (spritesToDraw, customContext) {
+        var c = customContext ? customContext : context,
             key,
             sprite;
 
@@ -62,8 +59,8 @@ window.PONG = (function () {
     },
 
     // clear old positions of sprites
-    clear = function (spritesToClear, context) {
-        var c = context ? context : getContext(),
+    clear = function (spritesToClear, customContext) {
+        var c = customContext ? customContext : context,
             key,
             sprite;
 
