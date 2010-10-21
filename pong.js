@@ -10,10 +10,10 @@ if (typeof Object.create !== 'function') {
 }
 
 window.PONG = (function () {
-    // base object for each sprite
     var canvas = window.document.getElementById('pong'),
     context = canvas.getContext('2d'),
     
+    // base object for each sprite
     sprite = {
         context: context,
         fillStyle: 'black',
