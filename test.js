@@ -43,6 +43,15 @@ YUI().use('test', function (Y) {
             Y.Assert.areSame(80, this.sprite.bottom);
         },
 
+        "placed should be false when ball hasn't been placed": function () {
+            Y.Assert.isFalse(this.ball.placed());
+        },
+
+        "placed should be true when ball has been placed": function () {
+            this.ball.place(0, 0);
+            Y.Assert.isTrue(this.ball.placed());
+        },
+
         "hits should be true when ball LHS over bat RHS": function () {
             this.bat.place(0, 50);
             this.ball.place(9, 50);
@@ -254,12 +263,98 @@ YUI().use('test', function (Y) {
             Y.Assert.isTrue(this.paddle2.drawCalled);
             Y.Assert.isTrue(this.ball.drawCalled);
         }
+    }),
+        
+    reset = new Y.Test.Case({
+        setUp: function () {
+            this.paddle1 = PONG.sprites.paddle1;
+            this.paddle1.place(0, 50);
+
+            this.paddle2 = PONG.sprites.paddle2;
+            this.paddle2.place(768, 20);
+
+            this.ball = PONG.sprites.ball;
+            this.ball.place(100, 100);
+
+            PONG.sprite.clear = function () {
+                this.clearCalled = true;
+                return this;
+            };
+
+            this.unplace = function (sprite) {
+                delete sprite.x;
+                delete sprite.y;
+                delete sprite.left;
+                delete sprite.right;
+                delete sprite.top;
+                delete sprite.bottom;
+            };
+        },
+
+        "should place paddle1": function () {
+            PONG.reset();
+            Y.Assert.areSame(0, this.paddle1.x);
+            Y.Assert.areSame(0, this.paddle1.y);
+        },
+
+        "should place paddle2": function () {
+            PONG.reset();
+            Y.Assert.areSame(768, this.paddle2.x);
+            Y.Assert.areSame(472, this.paddle2.y);
+        },
+
+        "should place the ball": function () {
+            PONG.reset();
+            Y.Assert.areSame(33, this.ball.x);
+            Y.Assert.areSame(1, this.ball.y);
+        },
+        
+        "should clear paddles and ball": function () {
+            this.paddle1.clearCalled = false;
+            this.paddle2.clearCalle = false;
+            this.ball.clearCalled = false;
+
+            PONG.reset();
+
+            Y.Assert.isTrue(this.paddle1.clearCalled);
+            Y.Assert.isTrue(this.paddle2.clearCalled);
+            Y.Assert.isTrue(this.ball.clearCalled);
+        },
+
+        "should not clear paddle1 if it hasn't been placed": function () {
+            this.paddle1.clearCalled = false;
+            this.unplace(this.paddle1);
+
+            PONG.reset();
+            Y.Assert.isFalse(this.paddle1.clearCalled);
+        },
+
+        "should not clear paddle2 if it hasn't been placed": function () {
+            this.paddle2.clearCalled = false;
+            this.unplace(this.paddle2);
+
+            PONG.reset();
+            Y.Assert.isFalse(this.paddle2.clearCalled);
+        },
+
+        "should not clear ball if it hasn't been placed": function () {
+            this.ball.clearCalled = false;
+            this.unplace(this.ball);
+
+            PONG.reset();
+            Y.Assert.isFalse(this.ball.clearCalled);
+        }
     });
 
     Y.Test.Runner.add(ball);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);
+
+    // dirty cases that override functions in lieu of finding a different
+    // mocking framework / refactoring
+    Y.Test.Runner.add(reset);
     Y.Test.Runner.add(update);
+
     Y.Test.Runner.run();
 });

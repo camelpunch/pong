@@ -12,6 +12,7 @@ if (typeof Object.create !== 'function') {
 window.PONG = (function () {
     var canvas = window.document.getElementById('pong'),
     context = canvas.getContext('2d'),
+    intervalId,
     
     // base object for each sprite
     sprite = {
@@ -27,6 +28,7 @@ window.PONG = (function () {
             );
         },
 
+        // set x, y coords and bounding box
         place: function (x, y) {
             this.x = x;
             this.y = y;
@@ -35,6 +37,20 @@ window.PONG = (function () {
             this.top = y;
             this.bottom = this.height + y;
             return this;
+        },
+
+        // true if sprite has been placed, false if missing values
+        placed: function () {
+            var properties = ['x', 'y', 'left', 'right', 'top', 'bottom'],
+            i;
+
+            for (i = 0; i < properties.length; i += 1) {
+                if (typeof this[properties[i]] !== 'number') {
+                    return false;
+                }
+            }
+
+            return true;
         },
 
         clear: function () {
@@ -98,6 +114,31 @@ window.PONG = (function () {
 
         paddle1.setY(y - (paddle1.height / 2));
         paddle2.setY(canvas.height - y - (paddle2.height / 2));
+    },
+    
+    // reset the game
+    reset = function () {
+        window.clearInterval(intervalId);
+
+        if (sprites.paddle1.placed()) {
+            sprites.paddle1.clear();
+        }
+        sprites.paddle1.place(0, 0);
+
+        if (sprites.paddle2.placed()) {
+            sprites.paddle2.clear();
+        }
+        sprites.paddle2.place(
+            canvas.width - sprites.paddle2.width, 
+            canvas.height - sprites.paddle2.height
+        );
+
+        if (sprites.ball.placed()) {
+            sprites.ball.clear();
+        }
+        sprites.ball.place(sprites.paddle1.right + 1, 1);
+
+        intervalId = window.setInterval(update, 20);
     };
 
     // paddles
@@ -120,14 +161,9 @@ window.PONG = (function () {
 
     sprites.paddle1 = Object.create(paddle);
     sprites.paddle1.fillStyle = 'blue';
-    sprites.paddle1.place(0, 0);
         
     sprites.paddle2 = Object.create(paddle);
     sprites.paddle2.fillStyle = 'red';
-    sprites.paddle2.place(
-        canvas.width - sprites.paddle2.width, 
-        canvas.height - sprites.paddle2.height
-    );
 
     // ball
     sprites.ball = Object.create(sprite);
@@ -144,7 +180,6 @@ window.PONG = (function () {
     };
     sprites.ball.width = 32;
     sprites.ball.height = 32;
-    sprites.ball.place(sprites.paddle1.right, 0);
 
     return {
         // objects used privately, also available publicly
@@ -152,7 +187,8 @@ window.PONG = (function () {
         paddle: paddle,
         sprites: sprites,
         update: update,
-        move: move
+        move: move,
+        reset: reset
     };
 }());
 
