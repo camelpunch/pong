@@ -68,6 +68,33 @@ YUI().use('test', function (Y) {
             this.bat.clear();
 
             Y.Mock.verify(this.bat.context);
+        },
+
+        "draw should set the fill style": function () {
+            this.bat.fillStyle = 'green';
+
+            this.bat.context = {
+                fillStyle: undefined,
+                fillRect: function () {
+                }
+            };
+
+            this.bat.draw();
+
+            Y.Assert.areSame('green', this.bat.context.fillStyle);
+        },
+
+        "draw should draw using the current dimensions": function () {
+            this.bat.context = Y.Mock();
+
+            Y.Mock.expect(this.bat.context, {
+                method: 'fillRect',
+                args: [this.bat.x, this.bat.y, this.bat.width, this.bat.height]
+            });
+
+            this.bat.draw();
+
+            Y.Mock.verify(this.bat.context);
         }
     }),
 
@@ -124,62 +151,6 @@ YUI().use('test', function (Y) {
         }
     }),
 
-    draw = new Y.Test.Case({
-        name: 'draw and clear',
-
-        setUp: function () {
-            var mario = Object.create(PONG.sprite),
-            luigi = Object.create(PONG.sprite),
-            context;
-
-            this.sprites = {};
-
-            mario.width = 30;
-            mario.height = 30;
-            mario.x = 30;
-            mario.y = 400;
-            mario.fillStyle = 'red';
-
-            luigi.width = 30;
-            luigi.height = 40;
-            luigi.x = 70;
-            luigi.y = 400;
-            luigi.fillStyle = 'green';
-
-            this.sprites.mario = mario;
-            this.sprites.luigi = luigi;
-
-            context = {
-                fillRectArgsReceived: [],
-                fillRect: function () {
-                    context.fillRectArgsReceived.push(arguments);
-                }
-            };
-
-            this.context = context;
-        },
-
-        "draw should set the fillStyle from the sprite property": function () {
-            PONG.draw(this.sprites, this.context);
-            // can expect the last set fillStyle to be green
-            Y.Assert.areSame('green', this.context.fillStyle);
-        },
-
-        "draw should draw a rectangle with each sprite's dimensions": function () {
-            PONG.draw(this.sprites, this.context);
-
-            Y.Assert.areSame(this.sprites.mario.x, this.context.fillRectArgsReceived[0][0]);
-            Y.Assert.areSame(this.sprites.mario.y,  this.context.fillRectArgsReceived[0][1]);
-            Y.Assert.areSame(this.sprites.mario.width, this.context.fillRectArgsReceived[0][2]);
-            Y.Assert.areSame(this.sprites.mario.height, this.context.fillRectArgsReceived[0][3]);
-
-            Y.Assert.areSame(this.sprites.luigi.x, this.context.fillRectArgsReceived[1][0]);
-            Y.Assert.areSame(this.sprites.luigi.y, this.context.fillRectArgsReceived[1][1]);
-            Y.Assert.areSame(this.sprites.luigi.width, this.context.fillRectArgsReceived[1][2]);
-            Y.Assert.areSame(this.sprites.luigi.height, this.context.fillRectArgsReceived[1][3]);
-        }
-    }),
-
     move = new Y.Test.Case({
         name: 'move',
 
@@ -218,32 +189,35 @@ YUI().use('test', function (Y) {
 
             this.paddle2 = PONG.sprites.paddle2;
             this.paddle2.place(568, 0);
+
+            PONG.sprite.clearCalled = false;
+            this.ball.moveCalled = false;
+            PONG.sprite.drawCalled = false;
+
+            PONG.sprite.clear = function () {
+                this.clearCalled = true;
+                return this;
+            };
+
+            this.ball.move = function () {
+                this.moveCalled = true;
+                return this;
+            };
+
+            PONG.sprite.draw = function () {
+                this.drawCalled = true;
+                return this;
+            };
         },
 
         "should clear the ball": function () {
-            var called = false;
-
-            this.ball.clear = function () {
-                called = true;
-                return this;
-            };
-
             PONG.update();
-
-            Y.assert(called);
+            Y.Assert.isTrue(this.ball.clearCalled);
         },
 
         "should move the ball": function () {
-            var called = false;
-
-            this.ball.move = function () {
-                called = true;
-                return this;
-            };
-
             PONG.update();
-
-            Y.assert(called);
+            Y.Assert.isTrue(this.ball.moveCalled);
         },
 
         "should reverse ball horizontally when it hits paddle1": function () {
@@ -272,11 +246,17 @@ YUI().use('test', function (Y) {
             this.ball.place(0, 0);
             PONG.update();
             Y.Assert.areSame(5, this.ball.yPixelsPerTick);
+        },
+
+        "should draw both paddles and the ball": function () {
+            PONG.update();
+            Y.Assert.isTrue(this.paddle1.drawCalled);
+            Y.Assert.isTrue(this.paddle2.drawCalled);
+            Y.Assert.isTrue(this.ball.drawCalled);
         }
     });
 
     Y.Test.Runner.add(ball);
-    Y.Test.Runner.add(draw);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);

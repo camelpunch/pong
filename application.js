@@ -13,7 +13,9 @@ YUI().use('node', function (Y) {
         PONG.sprites.paddle1.clear();
         PONG.sprites.paddle2.clear();
         PONG.move(coords);
-        PONG.draw(PONG.sprites);
+        PONG.sprites.paddle1.draw();
+        PONG.sprites.paddle2.draw();
+        PONG.sprites.ball.draw();
     });
 
     // game loop

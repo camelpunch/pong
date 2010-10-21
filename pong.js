@@ -40,6 +40,12 @@ window.PONG = (function () {
         clear: function () {
             this.context.clearRect(this.x, this.y, this.width, this.height);
             return this;
+        },
+
+        draw: function () {
+            this.context.fillStyle = this.fillStyle;
+            this.context.fillRect(this.x, this.y, this.width, this.height);
+            return this;
         }
     },
 
@@ -49,40 +55,25 @@ window.PONG = (function () {
     // container for sprites
     sprites = {},
 
-    // draw new positions of sprites
-    draw = function (spritesToDraw, customContext) {
-        var c = customContext ? customContext : context,
-            key,
-            sprite;
-
-        for (key in spritesToDraw) {
-            if (spritesToDraw.hasOwnProperty(key)) {
-                sprite = spritesToDraw[key];
-                c.fillStyle = sprite.fillStyle;
-                c.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
-            }
-        }
-    },
-
     // update the game without user interaction
     update = function () {
         var ball = sprites.ball,
 
-            // no need to define left, right or bottom, as they should never be
-            // evaluated
-            bottom = {
-                top: canvas.height
-            },
+        // no need to define left, right or bottom, as they should never be
+        // evaluated
+        bottom = {
+            top: canvas.height
+        },
 
-            // no need to define left or right, as they should never be
-            // evaluated
-            top = {
-                top: 0,
-                bottom: 0
-            },
+        // no need to define left or right, as they should never be
+        // evaluated
+        top = {
+            top: 0,
+            bottom: 0
+        },
 
-            paddle1 = sprites.paddle1,
-            paddle2 = sprites.paddle2;
+        paddle1 = sprites.paddle1,
+        paddle2 = sprites.paddle2;
 
         ball.clear().move();
 
@@ -94,7 +85,9 @@ window.PONG = (function () {
             ball.reverseY();
         }
 
-        draw(sprites);
+        paddle1.draw();
+        paddle2.draw();
+        ball.draw();
     },
     
     // set new positions given coords of cursor
@@ -158,7 +151,6 @@ window.PONG = (function () {
         sprite: sprite,
         paddle: paddle,
         sprites: sprites,
-        draw: draw,
         update: update,
         move: move
     };
