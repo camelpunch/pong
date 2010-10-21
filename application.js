@@ -4,10 +4,6 @@
 YUI().use('node', function (Y) {
     var ms = 20;
 
-    Y.on('domready', function () {
-        PONG.draw(PONG.sprites);
-    });
-
     Y.on('mousemove', function (e) {
         var coords = [e.clientX, e.clientY];
         PONG.sprites.paddle1.clear();
