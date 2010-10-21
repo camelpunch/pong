@@ -2,6 +2,8 @@
 "use strict";
 
 YUI().use('node', function (Y) {
+    var ms = 20;
+
     Y.on('mousemove', function (e) {
         var coords = [e.clientX, e.clientY];
         PONG.sprites.paddle1.clear();
@@ -12,8 +14,7 @@ YUI().use('node', function (Y) {
         PONG.sprites.ball.draw();
     });
 
-    Y.one(window.document).on('click', function () {
-        PONG.reset();
-    });
+    // game loop
+    window.setInterval(PONG.update, ms);
 });
 

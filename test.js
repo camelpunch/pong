@@ -254,60 +254,12 @@ YUI().use('test', function (Y) {
             Y.Assert.isTrue(this.paddle2.drawCalled);
             Y.Assert.isTrue(this.ball.drawCalled);
         }
-    }),
-        
-    reset = new Y.Test.Case({
-        setUp: function () {
-            this.paddle1 = PONG.sprites.paddle1;
-            this.paddle1.place(0, 50);
-
-            this.paddle2 = PONG.sprites.paddle2;
-            this.paddle2.place(768, 20);
-
-            this.ball = PONG.sprites.ball;
-            this.ball.place(100, 100);
-
-            PONG.sprite.clearCalled = false;
-
-            PONG.sprite.clear = function () {
-                this.clearCalled = true;
-                return this;
-            };
-
-            PONG.reset();
-        },
-
-        "should place paddle1": function () {
-            Y.Assert.areSame(0, this.paddle1.x);
-            Y.Assert.areSame(0, this.paddle1.y);
-        },
-
-        "should place paddle2": function () {
-            Y.Assert.areSame(768, this.paddle2.x);
-            Y.Assert.areSame(472, this.paddle2.y);
-        },
-
-        "should place the ball": function () {
-            Y.Assert.areSame(33, this.ball.x);
-            Y.Assert.areSame(1, this.ball.y);
-        },
-        
-        "should clear paddles and ball": function () {
-            Y.Assert.isTrue(this.paddle1.clearCalled);
-            Y.Assert.isTrue(this.paddle2.clearCalled);
-            Y.Assert.isTrue(this.ball.clearCalled);
-        }
     });
 
     Y.Test.Runner.add(ball);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);
-
-    // dirty cases that override functions in lieu of finding a different
-    // mocking framework / refactoring
-    Y.Test.Runner.add(reset);
     Y.Test.Runner.add(update);
-
     Y.Test.Runner.run();
 });

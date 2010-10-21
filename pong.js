@@ -12,7 +12,6 @@ if (typeof Object.create !== 'function') {
 window.PONG = (function () {
     var canvas = window.document.getElementById('pong'),
     context = canvas.getContext('2d'),
-    intervalId,
     
     // base object for each sprite
     sprite = {
@@ -99,20 +98,6 @@ window.PONG = (function () {
 
         paddle1.setY(y - (paddle1.height / 2));
         paddle2.setY(canvas.height - y - (paddle2.height / 2));
-    },
-    
-    // reset the game
-    reset = function () {
-        window.clearInterval(intervalId);
-
-        sprites.paddle1.clear().place(0, 0);
-        sprites.paddle2.clear().place(
-            canvas.width - sprites.paddle2.width, 
-            canvas.height - sprites.paddle2.height
-        );
-        sprites.ball.clear().place(sprites.paddle1.right + 1, 1);
-
-        intervalId = window.setInterval(update, 20);
     };
 
     // paddles
@@ -135,9 +120,14 @@ window.PONG = (function () {
 
     sprites.paddle1 = Object.create(paddle);
     sprites.paddle1.fillStyle = 'blue';
+    sprites.paddle1.place(0, 0);
         
     sprites.paddle2 = Object.create(paddle);
     sprites.paddle2.fillStyle = 'red';
+    sprites.paddle2.place(
+        canvas.width - sprites.paddle2.width, 
+        canvas.height - sprites.paddle2.height
+    );
 
     // ball
     sprites.ball = Object.create(sprite);
@@ -154,9 +144,7 @@ window.PONG = (function () {
     };
     sprites.ball.width = 32;
     sprites.ball.height = 32;
-
-    // set starting positions
-    reset();
+    sprites.ball.place(sprites.paddle1.right, 0);
 
     return {
         // objects used privately, also available publicly
@@ -164,8 +152,7 @@ window.PONG = (function () {
         paddle: paddle,
         sprites: sprites,
         update: update,
-        move: move,
-        reset: reset
+        move: move
     };
 }());
 
