@@ -139,9 +139,11 @@ window.PONG = (function () {
     };
 
     sprites.paddle1 = Object.create(paddle);
+    sprites.paddle1.fillStyle = 'blue';
     sprites.paddle1.place(0, 0);
         
     sprites.paddle2 = Object.create(paddle);
+    sprites.paddle2.fillStyle = 'red';
     sprites.paddle2.place(
         canvas.width - sprites.paddle2.width, 
         canvas.height - sprites.paddle2.height
