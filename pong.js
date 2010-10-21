@@ -14,7 +14,6 @@ window.PONG = (function () {
     var canvas = window.document.getElementById('pong'),
     
     sprite = {
-        y: 0,
         fillStyle: 'black',
 
         hits: function (other) {
