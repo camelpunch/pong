@@ -76,13 +76,13 @@ window.PONG = (function () {
     update = function () {
         var ball = sprites.ball,
 
-            // no need to define left and right, as they should never be
+            // no need to define left, right or bottom, as they should never be
             // evaluated
             bottom = {
                 top: canvas.height
             },
 
-            // no need to define left and right, as they should never be
+            // no need to define left or right, as they should never be
             // evaluated
             top = {
                 top: 0,
