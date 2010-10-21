@@ -111,8 +111,8 @@ YUI().use('test', function (Y) {
         }
     }),
 
-    draw = new Y.Test.Case({
-        name: 'draw',
+    drawAndClear = new Y.Test.Case({
+        name: 'draw and clear',
 
         setUp: function () {
             var mario = Object.create(PONG.sprite),
@@ -137,39 +137,51 @@ YUI().use('test', function (Y) {
             this.sprites.luigi = luigi;
 
             context = {
-                argsReceived: [],
+                fillRectArgsReceived: [],
+                clearRectArgsReceived: [],
                 fillRect: function () {
-                    var slice = Array.prototype.slice,
-                    args = slice.apply(arguments);
-                    context.argsReceived.push(args);
+                    context.fillRectArgsReceived.push(arguments);
+                },
+                clearRect: function () {
+                    context.clearRectArgsReceived.push(arguments);
                 }
             };
 
             this.context = context;
         },
 
-        "should set the fillStyle from the sprite property": function () {
+        "draw should set the fillStyle from the sprite property": function () {
             PONG.draw(this.sprites, this.context);
             // can expect the last set fillStyle to be green
             Y.Assert.areSame('green', this.context.fillStyle);
         },
 
-        "should draw a rectangle with each sprite's dimensions": function () {
-            var first = {}, 
-            second = {},
-            arg;
-
+        "draw should draw a rectangle with each sprite's dimensions": function () {
             PONG.draw(this.sprites, this.context);
 
-            Y.Assert.areSame(this.sprites.mario.x, this.context.argsReceived[0][0]);
-            Y.Assert.areSame(this.sprites.mario.y,  this.context.argsReceived[0][1]);
-            Y.Assert.areSame(this.sprites.mario.width, this.context.argsReceived[0][2]);
-            Y.Assert.areSame(this.sprites.mario.height, this.context.argsReceived[0][3]);
+            Y.Assert.areSame(this.sprites.mario.x, this.context.fillRectArgsReceived[0][0]);
+            Y.Assert.areSame(this.sprites.mario.y,  this.context.fillRectArgsReceived[0][1]);
+            Y.Assert.areSame(this.sprites.mario.width, this.context.fillRectArgsReceived[0][2]);
+            Y.Assert.areSame(this.sprites.mario.height, this.context.fillRectArgsReceived[0][3]);
 
-            Y.Assert.areSame(this.sprites.luigi.x, this.context.argsReceived[1][0]);
-            Y.Assert.areSame(this.sprites.luigi.y, this.context.argsReceived[1][1]);
-            Y.Assert.areSame(this.sprites.luigi.width, this.context.argsReceived[1][2]);
-            Y.Assert.areSame(this.sprites.luigi.height, this.context.argsReceived[1][3]);
+            Y.Assert.areSame(this.sprites.luigi.x, this.context.fillRectArgsReceived[1][0]);
+            Y.Assert.areSame(this.sprites.luigi.y, this.context.fillRectArgsReceived[1][1]);
+            Y.Assert.areSame(this.sprites.luigi.width, this.context.fillRectArgsReceived[1][2]);
+            Y.Assert.areSame(this.sprites.luigi.height, this.context.fillRectArgsReceived[1][3]);
+        },
+
+        "clear should clear a rectangle with each sprite's dimensions": function () {
+            PONG.clear(this.sprites, this.context);
+
+            Y.Assert.areSame(this.sprites.mario.x, this.context.clearRectArgsReceived[0][0]);
+            Y.Assert.areSame(this.sprites.mario.y,  this.context.clearRectArgsReceived[0][1]);
+            Y.Assert.areSame(this.sprites.mario.width, this.context.clearRectArgsReceived[0][2]);
+            Y.Assert.areSame(this.sprites.mario.height, this.context.clearRectArgsReceived[0][3]);
+
+            Y.Assert.areSame(this.sprites.luigi.x, this.context.clearRectArgsReceived[1][0]);
+            Y.Assert.areSame(this.sprites.luigi.y, this.context.clearRectArgsReceived[1][1]);
+            Y.Assert.areSame(this.sprites.luigi.width, this.context.clearRectArgsReceived[1][2]);
+            Y.Assert.areSame(this.sprites.luigi.height, this.context.clearRectArgsReceived[1][3]);
         }
     }),
 
@@ -243,7 +255,7 @@ YUI().use('test', function (Y) {
     });
 
     Y.Test.Runner.add(ball);
-    Y.Test.Runner.add(draw);
+    Y.Test.Runner.add(drawAndClear);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);

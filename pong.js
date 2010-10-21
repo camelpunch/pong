@@ -63,14 +63,14 @@ window.PONG = (function () {
     },
 
     // clear old positions of sprites
-    clear = function () {
-        var c = getContext(),
+    clear = function (spritesToClear, context) {
+        var c = context ? context : getContext(),
             key,
             sprite;
 
-        for (key in sprites) {
-            if (sprites.hasOwnProperty(key)) {
-                sprite = sprites[key];
+        for (key in spritesToClear) {
+            if (spritesToClear.hasOwnProperty(key)) {
+                sprite = spritesToClear[key];
                 c.clearRect(sprite.x, sprite.y, sprite.width, sprite.height);
             }
         }
@@ -96,7 +96,7 @@ window.PONG = (function () {
             paddle1 = sprites.paddle1,
             paddle2 = sprites.paddle2;
 
-        clear();
+        clear(sprites);
 
         ball.move();
 
