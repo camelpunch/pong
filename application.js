@@ -10,7 +10,8 @@ YUI().use('node', function (Y) {
 
     Y.on('mousemove', function (e) {
         var coords = [e.clientX, e.clientY];
-        PONG.clear(PONG.sprites);
+        PONG.sprites.paddle1.clear();
+        PONG.sprites.paddle2.clear();
         PONG.move(coords);
         PONG.draw(PONG.sprites);
     });

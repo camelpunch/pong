@@ -15,6 +15,7 @@ window.PONG = (function () {
     context = canvas.getContext('2d'),
     
     sprite = {
+        context: context,
         fillStyle: 'black',
 
         hits: function (other) {
@@ -33,6 +34,11 @@ window.PONG = (function () {
             this.right = this.width + x;
             this.top = y;
             this.bottom = this.height + y;
+            return this;
+        },
+
+        clear: function () {
+            this.context.clearRect(this.x, this.y, this.width, this.height);
             return this;
         }
     },
@@ -58,20 +64,6 @@ window.PONG = (function () {
         }
     },
 
-    // clear old positions of sprites
-    clear = function (spritesToClear, customContext) {
-        var c = customContext ? customContext : context,
-            key,
-            sprite;
-
-        for (key in spritesToClear) {
-            if (spritesToClear.hasOwnProperty(key)) {
-                sprite = spritesToClear[key];
-                c.clearRect(sprite.x, sprite.y, sprite.width, sprite.height);
-            }
-        }
-    },
-
     // update the game without user interaction
     update = function () {
         var ball = sprites.ball,
@@ -92,9 +84,7 @@ window.PONG = (function () {
             paddle1 = sprites.paddle1,
             paddle2 = sprites.paddle2;
 
-        clear(sprites);
-
-        ball.move();
+        ball.clear().move();
 
         if (ball.hits(paddle1) || ball.hits(paddle2)) {
             ball.reverseX();
@@ -168,7 +158,6 @@ window.PONG = (function () {
         sprite: sprite,
         paddle: paddle,
         sprites: sprites,
-        clear: clear,
         draw: draw,
         update: update,
         move: move

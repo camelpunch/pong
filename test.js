@@ -55,6 +55,19 @@ YUI().use('test', function (Y) {
             this.ball.place(11, 50);
 
             Y.Assert.isFalse(this.bat.hits(this.ball));
+        },
+
+        "clear should clear within the current dimensions": function () {
+            this.bat.context = Y.Mock();
+
+            Y.Mock.expect(this.bat.context, {
+                method: 'clearRect',
+                args: [this.bat.x, this.bat.y, this.bat.width, this.bat.height]
+            });
+
+            this.bat.clear();
+
+            Y.Mock.verify(this.bat.context);
         }
     }),
 
@@ -111,7 +124,7 @@ YUI().use('test', function (Y) {
         }
     }),
 
-    drawAndClear = new Y.Test.Case({
+    draw = new Y.Test.Case({
         name: 'draw and clear',
 
         setUp: function () {
@@ -138,12 +151,8 @@ YUI().use('test', function (Y) {
 
             context = {
                 fillRectArgsReceived: [],
-                clearRectArgsReceived: [],
                 fillRect: function () {
                     context.fillRectArgsReceived.push(arguments);
-                },
-                clearRect: function () {
-                    context.clearRectArgsReceived.push(arguments);
                 }
             };
 
@@ -168,20 +177,6 @@ YUI().use('test', function (Y) {
             Y.Assert.areSame(this.sprites.luigi.y, this.context.fillRectArgsReceived[1][1]);
             Y.Assert.areSame(this.sprites.luigi.width, this.context.fillRectArgsReceived[1][2]);
             Y.Assert.areSame(this.sprites.luigi.height, this.context.fillRectArgsReceived[1][3]);
-        },
-
-        "clear should clear a rectangle with each sprite's dimensions": function () {
-            PONG.clear(this.sprites, this.context);
-
-            Y.Assert.areSame(this.sprites.mario.x, this.context.clearRectArgsReceived[0][0]);
-            Y.Assert.areSame(this.sprites.mario.y,  this.context.clearRectArgsReceived[0][1]);
-            Y.Assert.areSame(this.sprites.mario.width, this.context.clearRectArgsReceived[0][2]);
-            Y.Assert.areSame(this.sprites.mario.height, this.context.clearRectArgsReceived[0][3]);
-
-            Y.Assert.areSame(this.sprites.luigi.x, this.context.clearRectArgsReceived[1][0]);
-            Y.Assert.areSame(this.sprites.luigi.y, this.context.clearRectArgsReceived[1][1]);
-            Y.Assert.areSame(this.sprites.luigi.width, this.context.clearRectArgsReceived[1][2]);
-            Y.Assert.areSame(this.sprites.luigi.height, this.context.clearRectArgsReceived[1][3]);
         }
     }),
 
@@ -225,6 +220,32 @@ YUI().use('test', function (Y) {
             this.paddle2.place(568, 0);
         },
 
+        "should clear the ball": function () {
+            var called = false;
+
+            this.ball.clear = function () {
+                called = true;
+                return this;
+            };
+
+            PONG.update();
+
+            Y.assert(called);
+        },
+
+        "should move the ball": function () {
+            var called = false;
+
+            this.ball.move = function () {
+                called = true;
+                return this;
+            };
+
+            PONG.update();
+
+            Y.assert(called);
+        },
+
         "should reverse ball horizontally when it hits paddle1": function () {
             this.ball.xPixelsPerTick = -5;
             this.ball.place(5, 0);
@@ -255,7 +276,7 @@ YUI().use('test', function (Y) {
     });
 
     Y.Test.Runner.add(ball);
-    Y.Test.Runner.add(drawAndClear);
+    Y.Test.Runner.add(draw);
     Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);
