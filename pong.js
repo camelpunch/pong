@@ -14,11 +14,14 @@ YUI().use('event-custom', function (Y) {
         var canvas = window.document.getElementById('pong'),
         context = canvas.getContext('2d'),
         intervalId,
+        sprites = [],
+        collisionDetectors = [],
 
         // base object for each sprite
         sprite = function (name, base) {
             var publicSprite = {
                 context: context,
+                name: name,
                 fillStyle: 'black',
 
                 intersects: function (other) {
@@ -69,73 +72,81 @@ YUI().use('event-custom', function (Y) {
 
             Y.mix(publicSprite, base);
 
-            // add event handling to sprite
-            Y.augment(publicSprite, Y.EventTarget);
-            publicSprite.publish('pong:collision');
+            // add event handling
+            if (publicSprite.detectCollisions) {
+                Y.augment(publicSprite, Y.EventTarget);
+                publicSprite.publish('pong:collision');
+                collisionDetectors[collisionDetectors.length] = publicSprite;
+            }
+
+            sprites[sprites.length] = publicSprite;
 
             return publicSprite;
         },
 
-        // base for each paddle
-        paddle,
-
-        // container for sprites
-        sprites = {
-            // Bottom of game. No need to define left, right or bottom, as they
-            // should never be evaluated.
-            bottom: {
-                top: canvas.height
-            },
-
-            // Top of game. No need to define left or right, as they should
-            // never be evaluated
-            top: {
-                top: 0,
-                bottom: 0
-            }
-        },
-
         // update the game without user interaction
         update = function () {
-            var ball = sprites.ball, sprite, i,
-            paddle1 = sprites.paddle1,
-            paddle2 = sprites.paddle2;
+            var collisionDetector, sprite, i, n;
 
-            paddle1.clear().move();
-            paddle2.clear().move();
-            ball.clear().move();
+            Y.fire('pong:pre-intersect');
 
-            for (i = 0; i < ball.canHit.length; i += 1) {
-                sprite = sprites[ball.canHit[i]];
-                if (ball.intersects(sprite)) {
-                    ball.fire('pong:collision', ball, sprite);
+            for (n = 0; n < collisionDetectors.length; n += 1) {
+                collisionDetector = collisionDetectors[n];
+                for (i = 0; i < sprites.length; i += 1) {
+                    sprite = sprites[i];
+                    if (collisionDetector !== sprite && collisionDetector.intersects(sprite)) {
+                        collisionDetector.fire('pong:collision', sprite);
+                    }
                 }
             }
 
-            paddle1.draw();
-            paddle2.draw();
-            ball.draw();
+            Y.fire('pong:post-intersect');
         },
 
         // reset the game
         reset = function () {
             window.clearInterval(intervalId);
 
-            if (sprites.ball.placed()) {
-                sprites.ball.clear();
-            }
-            sprites.ball.place(sprites.paddle1.right + 1, 1);
-
-            sprites.ball.xPixelsPerTick = 10;
-            sprites.ball.yPixelsPerTick = 11;
+            Y.fire('pong:reset');
 
             intervalId = window.setInterval(update, 20);
-        };
+        },
 
-        // paddles
-        paddle = sprite('paddle', {
+        // Top of game. No need to define left or right, as they should
+        // never be evaluated
+        top = {
+            name: 'top',
+            top: 0,
+            bottom: 0
+        },
+
+        // Bottom of game. No need to define left, right or bottom, as they
+        // should never be evaluated.
+        bottom = {
+            name: 'bottom',
+            top: canvas.height
+        },
+
+        ball = sprite('ball', {
+            detectCollisions: true,
+
+            move: function () {
+                this.place(this.x + this.xPixelsPerTick, this.y + this.yPixelsPerTick);
+            },
+            reverseX: function () {
+                this.xPixelsPerTick = 0 - this.xPixelsPerTick;
+            },
+            reverseY: function () {
+                this.yPixelsPerTick = 0 - this.yPixelsPerTick;
+            },
+            width: 32,
+            height: 32
+        }),
+
+        paddle1 = sprite('paddle1', {
             width: 32,
             height: 128,
+            fillStyle: 'blue',
             setY: function (y) {
                 var lowest = canvas.height - this.height;
 
@@ -160,59 +171,63 @@ YUI().use('event-custom', function (Y) {
                 }
                 return this;
             }
-        });
+        }),
 
-        sprites.paddle1 = Object.create(paddle);
-        sprites.paddle1.fillStyle = 'blue';
-        sprites.paddle1.place(0, 0);
+        paddle2 = sprite('paddle2', paddle1);
 
-        sprites.paddle2 = Object.create(paddle);
-        sprites.paddle2.fillStyle = 'red';
-        sprites.paddle2.place(
-            canvas.width - sprites.paddle2.width, 
-            canvas.height - sprites.paddle2.height
+        paddle1.place(0, 0);
+        paddle2.fillStyle = 'red';
+        paddle2.place(
+            canvas.width - paddle2.width, 
+            canvas.height - paddle2.height
         );
 
-        // ball
-        sprites.ball = sprite('ball', {
-            move: function () {
-                this.place(this.x + this.xPixelsPerTick, this.y + this.yPixelsPerTick);
-            },
-            reverseX: function () {
-                this.xPixelsPerTick = 0 - this.xPixelsPerTick;
-            },
-            reverseY: function () {
-                this.yPixelsPerTick = 0 - this.yPixelsPerTick;
-            },
-            width: 32,
-            height: 32,
-
-            // collision detection
-            canHit: [
-                'top',
-                'bottom',
-                'paddle1',
-                'paddle2'
-            ]
-        });
+        // add bottom and top to sprites
+        sprites[sprites.length] = bottom;
+        sprites[sprites.length] = top;
 
         // events
-        sprites.ball.on('pong:collision', function (ball, other) {
-            if (other === sprites.paddle1) {
-                ball.reverseX();
-                ball.place(other.right, ball.y);
-            } else if (other === sprites.paddle2) {
-                ball.reverseX();
-                ball.place(other.left - ball.width, ball.y);
-            } else if (other === sprites.top || other === sprites.bottom) {
-                ball.reverseY();
+        Y.on('pong:reset', function () {
+            if (ball.placed()) {
+                ball.clear();
             }
+            ball.place(paddle1.right + 1, 1);
+
+            ball.xPixelsPerTick = 10;
+            ball.yPixelsPerTick = 11;
+        });
+
+        Y.on('pong:pre-intersect', function () {
+            paddle1.clear().move();
+            paddle2.clear().move();
+            ball.clear().move();
+        });
+
+        ball.on('pong:collision', function (other) {
+            if (other === paddle1) {
+                this.reverseX();
+                this.place(other.right, this.y);
+            } else if (other === paddle2) {
+                this.reverseX();
+                this.place(other.left - this.width, this.y);
+            } else if (other === top || other === bottom) {
+                this.reverseY();
+            }
+        });
+
+        Y.on('pong:post-intersect', function () {
+            paddle1.draw();
+            paddle2.draw();
+            ball.draw();
         });
 
         return {
             // objects used privately, also available publicly
             sprite: sprite,
-            paddle: paddle,
+            collisionDetectors: collisionDetectors,
+            ball: ball,
+            paddle1: paddle1,
+            paddle2: paddle2,
             sprites: sprites,
             update: update,
             reset: reset

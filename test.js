@@ -24,6 +24,22 @@ YUI().use('test', function (Y) {
             });
         },
 
+        "should set name": function () {
+            Y.Assert.areSame('somesprite', this.sprite.name);
+        },
+
+        "should be added to sprites": function () {
+            Y.ArrayAssert.contains(this.sprite, PONG.sprites);
+        },
+
+        "should be added to collisionDetectors if detectCollisions true": function () {
+            var sprite = PONG.sprite('mario', {
+                detectCollisions: true
+            });
+
+            Y.ArrayAssert.contains(sprite, PONG.collisionDetectors);
+        },
+
         "place should set left to be x position": function () {
             this.sprite.place(50, 50);
             Y.Assert.areSame(50, this.sprite.left);
@@ -112,7 +128,7 @@ YUI().use('test', function (Y) {
         name: 'paddle',
 
         setUp: function () {
-            this.paddle = Object.create(PONG.paddle);
+            this.paddle = Object.create(PONG.paddle1);
             this.paddle.height = 100;
         },
 
@@ -151,7 +167,7 @@ YUI().use('test', function (Y) {
         name: 'ball',
 
         setUp: function () {
-            this.ball = PONG.sprites.ball;
+            this.ball = PONG.collisionDetectors[0];
             this.ball.x = 53;
             this.ball.left = 53;
             this.ball.y = 30;
@@ -198,128 +214,123 @@ YUI().use('test', function (Y) {
             next1,
             next2;
 
-            this.ball = PONG.sprites.ball;
-
-            this.paddle1 = PONG.sprites.paddle1;
-
-            next1 = Object.create(this.paddle1);
+            next1 = Object.create(PONG.paddle1);
             next1.y = 10;
-            this.paddle1.next = next1;
+            PONG.paddle1.next = next1;
 
-            this.paddle1.place(0, 0);
+            PONG.paddle1.place(0, 0);
 
-            this.paddle2 = PONG.sprites.paddle2;
-            next2 = Object.create(this.paddle2);
+            next2 = Object.create(PONG.paddle2);
             next2.y = 20;
-            this.paddle2.next = next2;
+            PONG.paddle2.next = next2;
 
-            this.paddle2.place(568, 0);
+            PONG.paddle2.place(568, 0);
 
-            this.ball.clear = clear;
-            this.paddle1.clear = clear;
-            this.paddle2.clear = clear;
+            PONG.ball.clear = clear;
+            PONG.paddle1.clear = clear;
+            PONG.paddle2.clear = clear;
 
-            this.ball.move = move;
-            this.paddle1.move = move;
-            this.paddle2.move = move;
+            PONG.ball.move = move;
+            PONG.paddle1.move = move;
+            PONG.paddle2.move = move;
 
-            this.ball.draw = draw;
-            this.paddle1.draw = draw;
-            this.paddle2.draw = draw;
+            PONG.ball.draw = draw;
+            PONG.paddle1.draw = draw;
+            PONG.paddle2.draw = draw;
         },
 
         "should clear the ball": function () {
             PONG.update();
-            Y.Assert.isTrue(this.ball.clearCalled);
+            Y.Assert.isTrue(PONG.ball.clearCalled);
         },
 
         "should move the ball": function () {
             PONG.update();
-            Y.Assert.isTrue(this.ball.moveCalled);
+            Y.Assert.isTrue(PONG.ball.moveCalled);
         },
 
         "should clear paddle1": function () {
             PONG.update();
-            Y.Assert.isTrue(this.paddle1.clearCalled);
+            Y.Assert.isTrue(PONG.paddle1.clearCalled);
         },
 
         "should clear paddle2": function () {
             PONG.update();
-            Y.Assert.isTrue(this.paddle2.clearCalled);
+            Y.Assert.isTrue(PONG.paddle2.clearCalled);
         },
 
         "should move paddle1": function () {
             PONG.update();
-            Y.Assert.isTrue(this.paddle1.moveCalled);
+            Y.Assert.isTrue(PONG.paddle1.moveCalled);
         },
 
         "should move paddle2": function () {
             PONG.update();
-            Y.Assert.isTrue(this.paddle2.moveCalled);
+            Y.Assert.isTrue(PONG.paddle2.moveCalled);
         },
 
         "should reverse ball horizontally when it intersects paddle1": function () {
-            this.ball.xPixelsPerTick = -5;
-            this.ball.place(5, 0);
+            PONG.ball.xPixelsPerTick = -5;
+            PONG.ball.place(5, 0);
             PONG.update();
-            Y.Assert.areSame(5, this.ball.xPixelsPerTick);
+            Y.Assert.areSame(5, PONG.ball.xPixelsPerTick);
         },
 
         "should correct ball when it intersects paddle1": function () {
-            this.ball.xPixelsPerTick = -5;
-            this.ball.place(5, 0);
+            PONG.ball.xPixelsPerTick = -5;
+            PONG.ball.place(5, 0);
             PONG.update();
-            Y.Assert.areSame(32, this.ball.x);
+            Y.Assert.areSame(32, PONG.ball.x);
         },
 
         "should reverse ball horizontally when it intersects paddle2": function () {
-            this.ball.xPixelsPerTick = 5;
-            this.ball.place(595, 0);
+            PONG.ball.xPixelsPerTick = 5;
+            PONG.ball.place(595, 0);
             PONG.update();
-            Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
+            Y.Assert.areSame(-5, PONG.ball.xPixelsPerTick);
         },
 
         "should correct ball when it intersects paddle2": function () {
-            this.ball.xPixelsPerTick = -5;
-            this.ball.place(595, 0);
+            PONG.ball.xPixelsPerTick = -5;
+            PONG.ball.place(595, 0);
             PONG.update();
-            Y.Assert.areSame(536, this.ball.x);
+            Y.Assert.areSame(536, PONG.ball.x);
         },
 
         "should reverse ball vertically when it intersects bottom": function () {
-            this.ball.yPixelsPerTick = 5;
-            this.ball.place(0, 595);
+            PONG.ball.yPixelsPerTick = 5;
+            PONG.ball.place(0, 595);
             PONG.update();
-            Y.Assert.areSame(-5, this.ball.yPixelsPerTick);
+            Y.Assert.areSame(-5, PONG.ball.yPixelsPerTick);
         },
 
         "should reverse ball vertically when it intersects top": function () {
-            this.ball.yPixelsPerTick = -5;
-            this.ball.place(0, 0);
+            PONG.ball.yPixelsPerTick = -5;
+            PONG.ball.place(0, 0);
             PONG.update();
-            Y.Assert.areSame(5, this.ball.yPixelsPerTick);
+            Y.Assert.areSame(5, PONG.ball.yPixelsPerTick);
         },
 
         "should draw both paddles and the ball": function () {
             PONG.update();
-            Y.Assert.isTrue(this.paddle1.drawCalled);
-            Y.Assert.isTrue(this.paddle2.drawCalled);
-            Y.Assert.isTrue(this.ball.drawCalled);
+            Y.Assert.isTrue(PONG.paddle1.drawCalled);
+            Y.Assert.isTrue(PONG.paddle2.drawCalled);
+            Y.Assert.isTrue(PONG.ball.drawCalled);
         }
     }),
         
     reset = new Y.Test.Case({
         setUp: function () {
-            this.paddle1 = PONG.sprites.paddle1;
+            this.paddle1 = PONG.paddle1;
             this.paddle1.place(0, 50);
 
-            this.paddle2 = PONG.sprites.paddle2;
+            this.paddle2 = PONG.paddle2;
             this.paddle2.place(768, 20);
 
-            this.ball = PONG.sprites.ball;
+            this.ball = PONG.ball;
             this.ball.place(100, 100);
 
-            PONG.sprites.ball.clear = function () {
+            PONG.ball.clear = function () {
                 this.clearCalled = true;
                 return this;
             };
