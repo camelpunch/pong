@@ -19,7 +19,7 @@ window.PONG = (function () {
         context: context,
         fillStyle: 'black',
 
-        hits: function (other) {
+        intersects: function (other) {
             return !(
                 this.bottom < other.top ||
                 this.top > other.bottom ||
@@ -93,11 +93,11 @@ window.PONG = (function () {
 
         ball.clear().move();
 
-        if (ball.hits(paddle1) || ball.hits(paddle2)) {
+        if (ball.intersects(paddle1) || ball.intersects(paddle2)) {
             ball.reverseX();
         }
 
-        if (ball.hits(bottom) || ball.hits(top)) {
+        if (ball.intersects(bottom) || ball.intersects(top)) {
             ball.reverseY();
         }
 

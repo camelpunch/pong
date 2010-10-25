@@ -52,18 +52,18 @@ YUI().use('test', function (Y) {
             Y.Assert.isTrue(this.ball.placed());
         },
 
-        "hits should be true when ball LHS over bat RHS": function () {
+        "intersects should be true when ball LHS over bat RHS": function () {
             this.bat.place(0, 50);
             this.ball.place(9, 50);
 
-            Y.assert(this.bat.hits(this.ball));
+            Y.assert(this.bat.intersects(this.ball));
         },
 
-        "hits should be false when ball RHS not over bat LHS": function () {
+        "intersects should be false when ball RHS not over bat LHS": function () {
             this.bat.place(0, 50);
             this.ball.place(11, 50);
 
-            Y.Assert.isFalse(this.bat.hits(this.ball));
+            Y.Assert.isFalse(this.bat.intersects(this.ball));
         },
 
         "clear should clear within the current dimensions": function () {
@@ -229,28 +229,28 @@ YUI().use('test', function (Y) {
             Y.Assert.isTrue(this.ball.moveCalled);
         },
 
-        "should reverse ball horizontally when it hits paddle1": function () {
+        "should reverse ball horizontally when it intersects paddle1": function () {
             this.ball.xPixelsPerTick = -5;
             this.ball.place(5, 0);
             PONG.update();
             Y.Assert.areSame(5, this.ball.xPixelsPerTick);
         },
 
-        "should reverse ball horizontally when it hits paddle2": function () {
+        "should reverse ball horizontally when it intersects paddle2": function () {
             this.ball.xPixelsPerTick = 5;
             this.ball.place(595, 0);
             PONG.update();
             Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
         },
 
-        "should reverse ball vertically when it hits bottom": function () {
+        "should reverse ball vertically when it intersects bottom": function () {
             this.ball.yPixelsPerTick = 5;
             this.ball.place(0, 595);
             PONG.update();
             Y.Assert.areSame(-5, this.ball.yPixelsPerTick);
         },
 
-        "should reverse ball vertically when it hits top": function () {
+        "should reverse ball vertically when it intersects top": function () {
             this.ball.yPixelsPerTick = -5;
             this.ball.place(0, 0);
             PONG.update();
