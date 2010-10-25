@@ -236,11 +236,25 @@ YUI().use('test', function (Y) {
             Y.Assert.areSame(5, this.ball.xPixelsPerTick);
         },
 
+        "should correct ball when it intersects paddle1": function () {
+            this.ball.xPixelsPerTick = -5;
+            this.ball.place(5, 0);
+            PONG.update();
+            Y.Assert.areSame(32, this.ball.x);
+        },
+
         "should reverse ball horizontally when it intersects paddle2": function () {
             this.ball.xPixelsPerTick = 5;
             this.ball.place(595, 0);
             PONG.update();
             Y.Assert.areSame(-5, this.ball.xPixelsPerTick);
+        },
+
+        "should correct ball when it intersects paddle2": function () {
+            this.ball.xPixelsPerTick = -5;
+            this.ball.place(595, 0);
+            PONG.update();
+            Y.Assert.areSame(536, this.ball.x);
         },
 
         "should reverse ball vertically when it intersects bottom": function () {

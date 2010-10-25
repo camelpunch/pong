@@ -93,6 +93,13 @@ window.PONG = (function () {
 
         ball.clear().move();
 
+        // corrections
+        if (ball.intersects(paddle1)) {
+            ball.place(paddle1.right, ball.y);
+        } else if (ball.intersects(paddle2)) {
+            ball.place(paddle2.left - ball.width, ball.y);
+        }
+
         if (ball.intersects(paddle1) || ball.intersects(paddle2)) {
             ball.reverseX();
         }
