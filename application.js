@@ -12,9 +12,7 @@ YUI().use('node', function (Y) {
             paddle2.setY(600 - y - (paddle2.height / 2));
         });
 
-        Y.one(window.document).on('click', function () {
-            PONG.reset();
-        });
+        Y.one(window.document).on('click', PONG.reset);
 
         PONG.reset();
     });
