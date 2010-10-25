@@ -115,14 +115,34 @@ YUI().use('test', function (Y) {
             this.paddle.height = 100;
         },
 
+        "move should place paddle according to its next position": function () {
+            this.paddle.next = Object.create(this.paddle);
+            this.paddle.next.y = 55;
+            this.paddle.next.top = 55;
+            this.paddle.move();
+            Y.Assert.areSame(55, this.paddle.y);
+            Y.Assert.areSame(55, this.paddle.top);
+        },
+
+        "move should not break if no next position": function () {
+            this.paddle.move();
+        },
+
+        "setY should store new coords": function () {
+            this.paddle.x = 5;
+            this.paddle.setY(10);
+            Y.Assert.areSame(5, this.paddle.next.x);
+            Y.Assert.areSame(10, this.paddle.next.y);
+        },
+
         "setY should stop paddle from leaving top of canvas": function () {
             this.paddle.setY(-10);
-            Y.Assert.areSame(0, this.paddle.y);
+            Y.Assert.areSame(0, this.paddle.next.y);
         },
 
         "setY should stop paddle from leaving bottom of canvas": function () {
             this.paddle.setY(601);
-            Y.Assert.areSame(500, this.paddle.y);
+            Y.Assert.areSame(500, this.paddle.next.y);
         }
     }),
 
@@ -160,58 +180,43 @@ YUI().use('test', function (Y) {
         }
     }),
 
-    move = new Y.Test.Case({
-        name: 'move',
-
-        setUp: function () {
-            this.paddle1 = PONG.sprites.paddle1;
-            this.paddle2 = PONG.sprites.paddle2;
-        },
-
-        "should set paddle1 y central to cursor": function () {
-            var coords = [20, 400];
-
-            Y.Assert.areSame(128, this.paddle1.height);
-
-            PONG.move(coords);
-
-            Y.Assert.areSame(336, this.paddle1.y);
-        },
-
-        "should set paddle2 y opposite": function () {
-            var coords = [20, 400];
-
-            Y.Assert.areSame(128, this.paddle2.height);
-
-            PONG.move(coords);
-
-            Y.Assert.areSame(136, this.paddle2.y);
-        }
-    }),
-        
     update = new Y.Test.Case({
         setUp: function () {
+            var clear = function () {
+                this.clearCalled = true;
+                return this;
+            },
+            move = function () {
+                this.moveCalled = true;
+                return this;
+            },
+            next1,
+            next2;
+
             this.ball = PONG.sprites.ball;
 
             this.paddle1 = PONG.sprites.paddle1;
+
+            next1 = Object.create(this.paddle1);
+            next1.y = 10;
+            this.paddle1.next = next1;
+
             this.paddle1.place(0, 0);
 
             this.paddle2 = PONG.sprites.paddle2;
+            next2 = Object.create(this.paddle2);
+            next2.y = 20;
+            this.paddle2.next = next2;
+
             this.paddle2.place(568, 0);
 
-            PONG.sprite.clearCalled = false;
-            this.ball.moveCalled = false;
-            PONG.sprite.drawCalled = false;
+            this.ball.clear = clear;
+            this.paddle1.clear = clear;
+            this.paddle2.clear = clear;
 
-            PONG.sprite.clear = function () {
-                this.clearCalled = true;
-                return this;
-            };
-
-            this.ball.move = function () {
-                this.moveCalled = true;
-                return this;
-            };
+            this.ball.move = move;
+            this.paddle1.move = move;
+            this.paddle2.move = move;
 
             PONG.sprite.draw = function () {
                 this.drawCalled = true;
@@ -227,6 +232,26 @@ YUI().use('test', function (Y) {
         "should move the ball": function () {
             PONG.update();
             Y.Assert.isTrue(this.ball.moveCalled);
+        },
+
+        "should clear paddle1": function () {
+            PONG.update();
+            Y.Assert.isTrue(this.paddle1.clearCalled);
+        },
+
+        "should clear paddle2": function () {
+            PONG.update();
+            Y.Assert.isTrue(this.paddle2.clearCalled);
+        },
+
+        "should move paddle1": function () {
+            PONG.update();
+            Y.Assert.isTrue(this.paddle1.moveCalled);
+        },
+
+        "should move paddle2": function () {
+            PONG.update();
+            Y.Assert.isTrue(this.paddle2.moveCalled);
         },
 
         "should reverse ball horizontally when it intersects paddle1": function () {
@@ -305,16 +330,14 @@ YUI().use('test', function (Y) {
             };
         },
 
-        "should place paddle1": function () {
+        "should set ball xPixelsPerTick": function () {
             PONG.reset();
-            Y.Assert.areSame(0, this.paddle1.x);
-            Y.Assert.areSame(0, this.paddle1.y);
+            Y.Assert.areSame(10, this.ball.xPixelsPerTick);
         },
 
-        "should place paddle2": function () {
+        "should set ball yPixelsPerTick": function () {
             PONG.reset();
-            Y.Assert.areSame(768, this.paddle2.x);
-            Y.Assert.areSame(472, this.paddle2.y);
+            Y.Assert.areSame(11, this.ball.yPixelsPerTick);
         },
 
         "should place the ball": function () {
@@ -323,15 +346,11 @@ YUI().use('test', function (Y) {
             Y.Assert.areSame(1, this.ball.y);
         },
         
-        "should clear paddles and ball": function () {
-            this.paddle1.clearCalled = false;
-            this.paddle2.clearCalle = false;
+        "should clear ball": function () {
             this.ball.clearCalled = false;
 
             PONG.reset();
 
-            Y.Assert.isTrue(this.paddle1.clearCalled);
-            Y.Assert.isTrue(this.paddle2.clearCalled);
             Y.Assert.isTrue(this.ball.clearCalled);
         },
 
@@ -361,7 +380,6 @@ YUI().use('test', function (Y) {
     });
 
     Y.Test.Runner.add(ball);
-    Y.Test.Runner.add(move);
     Y.Test.Runner.add(paddle);
     Y.Test.Runner.add(sprite);
 
