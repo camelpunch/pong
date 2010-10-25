@@ -95,19 +95,16 @@ window.PONG = (function () {
         paddle2.clear().move();
         ball.clear().move();
 
-        if (ball.intersects(paddle1) || ball.intersects(paddle2)) {
+        if (ball.intersects(paddle1)) {
             ball.reverseX();
+            ball.place(paddle1.right, ball.y);
+        } else if (ball.intersects(paddle2)) {
+            ball.reverseX();
+            ball.place(paddle2.left - ball.width, ball.y);
         }
 
         if (ball.intersects(bottom) || ball.intersects(top)) {
             ball.reverseY();
-        }
-
-        // corrections
-        if (ball.intersects(paddle1)) {
-            ball.place(paddle1.right, ball.y);
-        } else if (ball.intersects(paddle2)) {
-            ball.place(paddle2.left - ball.width, ball.y);
         }
 
         paddle1.draw();
