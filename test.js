@@ -6,21 +6,22 @@ YUI().use('test', function (Y) {
         name: 'sprite',
 
         setUp: function () {
-            this.sprite = Object.create(PONG.sprite);
-            this.sprite.x = 40;
-            this.sprite.y = 70;
-            this.sprite.width = 10;
-            this.sprite.height = 30;
+            this.sprite = PONG.sprite('somesprite', {
+                x: 40,
+                y: 70,
+                width: 10,
+                height: 30
+            });
 
-            this.bat = Object.create(this.sprite);
-            this.bat.name = 'Bat';
-            this.bat.width = 10;
-            this.bat.height = 30;
+            this.bat = PONG.sprite('Bat', {
+                width: 10,
+                height: 30
+            });
 
-            this.ball = Object.create(this.sprite);
-            this.ball.name = 'Ball';
-            this.ball.width = 5;
-            this.ball.height = 5;
+            this.ball = PONG.sprite('Ball', {
+                width: 5,
+                height: 5
+            });
         },
 
         "place should set left to be x position": function () {
@@ -190,6 +191,10 @@ YUI().use('test', function (Y) {
                 this.moveCalled = true;
                 return this;
             },
+            draw = function () {
+                this.drawCalled = true;
+                return this;
+            },
             next1,
             next2;
 
@@ -218,10 +223,9 @@ YUI().use('test', function (Y) {
             this.paddle1.move = move;
             this.paddle2.move = move;
 
-            PONG.sprite.draw = function () {
-                this.drawCalled = true;
-                return this;
-            };
+            this.ball.draw = draw;
+            this.paddle1.draw = draw;
+            this.paddle2.draw = draw;
         },
 
         "should clear the ball": function () {
@@ -315,7 +319,7 @@ YUI().use('test', function (Y) {
             this.ball = PONG.sprites.ball;
             this.ball.place(100, 100);
 
-            PONG.sprite.clear = function () {
+            PONG.sprites.ball.clear = function () {
                 this.clearCalled = true;
                 return this;
             };
