@@ -86,19 +86,17 @@ YUI().use('event-custom', function (Y) {
 
         // update the game without user interaction
         update = function () {
-            var collisionDetector, sprite, i, n;
+            var collisionDetector, sprite;
 
             Y.fire('pong:pre-intersect');
 
-            for (n = 0; n < collisionDetectors.length; n += 1) {
-                collisionDetector = collisionDetectors[n];
-                for (i = 0; i < sprites.length; i += 1) {
-                    sprite = sprites[i];
+            Y.each(collisionDetectors, function (collisionDetector) {
+                Y.each(sprites, function (sprite) {
                     if (collisionDetector !== sprite && collisionDetector.intersects(sprite)) {
                         collisionDetector.fire('pong:collision', sprite);
                     }
-                }
-            }
+                });
+            });
 
             Y.fire('pong:post-intersect');
         },
