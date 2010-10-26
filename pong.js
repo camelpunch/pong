@@ -1,123 +1,12 @@
-/*global window, YUI */
+/*global window, YUI, ARNIE, PONG */
 "use strict";
 
-YUI().use('event-custom', function (Y) {
+YUI().use('node', 'event-custom', function (Y) {
     window.PONG = (function () {
         var canvas = window.document.getElementById('pong'),
-        context = canvas.getContext('2d'),
-        intervalId,
-        sprites = [],
-        collisionDetectors = [],
+        game = ARNIE.game(canvas, Y),
 
-        // base object for each sprite
-        sprite = function (name, base) {
-            var publicSprite = {
-                context: context,
-                name: name,
-                fillStyle: 'black',
-
-                intersects: function (other) {
-                    return !(
-                        this.bottom < other.top ||
-                        this.top > other.bottom ||
-                        this.right < other.left ||
-                        this.left > other.right
-                    );
-                },
-
-                // set x, y coords and bounding box
-                place: function (x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.left = x;
-                    this.right = this.width + x;
-                    this.top = y;
-                    this.bottom = this.height + y;
-                    return this;
-                },
-
-                // true if sprite has been placed, false if missing values
-                placed: function () {
-                    var properties = ['x', 'y', 'left', 'right', 'top', 'bottom'],
-                    i;
-
-                    for (i = 0; i < properties.length; i += 1) {
-                        if (typeof this[properties[i]] !== 'number') {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                },
-
-                clear: function () {
-                    this.context.clearRect(this.x, this.y, this.width, this.height);
-                    return this;
-                },
-
-                draw: function () {
-                    this.context.fillStyle = this.fillStyle;
-                    this.context.fillRect(this.x, this.y, this.width, this.height);
-                    return this;
-                }
-            };
-
-            publicSprite = Y.merge(publicSprite, base);
-
-            // add event handling
-            if (publicSprite.detectCollisions) {
-                Y.augment(publicSprite, Y.EventTarget);
-                publicSprite.publish('pong:collision');
-                collisionDetectors[collisionDetectors.length] = publicSprite;
-            }
-
-            sprites[sprites.length] = publicSprite;
-
-            return publicSprite;
-        },
-
-        // update the game without user interaction
-        update = function () {
-            var collisionDetector, sprite;
-
-            Y.fire('pong:pre-intersect');
-
-            Y.each(collisionDetectors, function (collisionDetector) {
-                Y.each(sprites, function (sprite) {
-                    if (collisionDetector !== sprite && collisionDetector.intersects(sprite)) {
-                        collisionDetector.fire('pong:collision', sprite);
-                    }
-                });
-            });
-
-            Y.fire('pong:post-intersect');
-        },
-
-        // reset the game
-        reset = function () {
-            window.clearInterval(intervalId);
-
-            Y.fire('pong:reset');
-
-            intervalId = window.setInterval(update, 20);
-        },
-
-        // Top of game. No need to define left or right, as they should
-        // never be evaluated
-        top = {
-            name: 'top',
-            top: 0,
-            bottom: 0
-        },
-
-        // Bottom of game. No need to define left, right or bottom, as they
-        // should never be evaluated.
-        bottom = {
-            name: 'bottom',
-            top: canvas.height
-        },
-
-        ball = sprite('ball', {
+        ball = game.sprite('ball', {
             detectCollisions: true,
 
             move: function () {
@@ -133,7 +22,7 @@ YUI().use('event-custom', function (Y) {
             height: 32
         }),
 
-        paddle1 = sprite('paddle1', {
+        paddle1 = game.sprite('paddle1', {
             width: 32,
             height: 128,
             fillStyle: 'blue',
@@ -163,7 +52,17 @@ YUI().use('event-custom', function (Y) {
             }
         }),
 
-        paddle2 = sprite('paddle2', paddle1);
+        paddle2 = game.sprite('paddle2', paddle1),
+        
+        top = game.sprite('top', {
+            width: canvas.width,
+            height: 1
+        }),
+            
+        bottom = game.sprite('bottom', {
+            width: canvas.width,
+            height: 1
+        });
 
         paddle1.place(0, 0);
         paddle2.fillStyle = 'red';
@@ -172,28 +71,17 @@ YUI().use('event-custom', function (Y) {
             canvas.height - paddle2.height
         );
 
-        // add bottom and top to sprites
-        sprites[sprites.length] = bottom;
-        sprites[sprites.length] = top;
+        top.place(0, 0);
+        bottom.place(0, canvas.height);
 
         // events
-        Y.on('pong:reset', function () {
-            if (ball.placed()) {
-                ball.clear();
-            }
-            ball.place(paddle1.right + 1, 1);
-
-            ball.xPixelsPerTick = 10;
-            ball.yPixelsPerTick = 11;
-        });
-
-        Y.on('pong:pre-intersect', function () {
+        Y.on('arnie:pre-intersect', function () {
             paddle1.clear().move();
             paddle2.clear().move();
             ball.clear().move();
         });
 
-        ball.on('pong:collision', function (other) {
+        ball.on('arnie:collision', function (other) {
             if (other === paddle1) {
                 this.reverseX();
                 this.place(other.right, this.y);
@@ -205,23 +93,44 @@ YUI().use('event-custom', function (Y) {
             }
         });
 
-        Y.on('pong:post-intersect', function () {
+        Y.on('arnie:post-intersect', function () {
             paddle1.draw();
             paddle2.draw();
             ball.draw();
         });
 
+        Y.on('arnie:reset', function () {
+            if (ball.placed()) {
+                ball.clear();
+            }
+            ball.place(paddle1.right + 1, 1);
+
+            ball.xPixelsPerTick = 10;
+            ball.yPixelsPerTick = 11;
+        });
+
+        Y.on('mousemove', function (e) {
+            paddle1.setY(e.clientY - (paddle1.height / 2));
+            paddle2.setY(600 - e.clientY - (paddle2.height / 2));
+        });
+
         return {
             // objects used privately, also available publicly
-            sprite: sprite,
-            collisionDetectors: collisionDetectors,
+            Y: Y,
+            game: game,
             ball: ball,
             paddle1: paddle1,
             paddle2: paddle2,
-            sprites: sprites,
-            update: update,
-            reset: reset
+            bottom: bottom,
+            top: top
         };
     }());
-});
 
+    Y.on('domready', function (e) {
+        Y.one(window.document).on('click', function () {
+            PONG.game.reset();
+        });
+
+        PONG.game.reset();
+    });
+});

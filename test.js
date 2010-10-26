@@ -9,12 +9,16 @@ if (typeof Object.create !== 'function') {
     };
 }
 
-YUI().use('test', function (Y) {
-    var sprite = new Y.Test.Case({
+YUI().use('test', 'event-custom', function (Y) {
+    var canvas = window.document.getElementById('pong'),
+
+    sprite = new Y.Test.Case({
         name: 'sprite',
 
         setUp: function () {
-            this.sprite = PONG.sprite('somesprite', {
+            this.game = ARNIE.game(canvas, Y);
+
+            this.sprite = this.game.sprite('somesprite', {
                 x: 40,
                 y: 70,
                 width: 10,
@@ -22,12 +26,12 @@ YUI().use('test', function (Y) {
                 fillStyle: 'blue'
             });
 
-            this.bat = PONG.sprite('Bat', {
+            this.bat = this.game.sprite('Bat', {
                 width: 10,
                 height: 30
             });
 
-            this.ball = PONG.sprite('Ball', {
+            this.ball = this.game.sprite('Ball', {
                 width: 5,
                 height: 5
             });
@@ -38,7 +42,7 @@ YUI().use('test', function (Y) {
         },
 
         "should be added to sprites": function () {
-            Y.ArrayAssert.contains(this.sprite, PONG.sprites);
+            Y.ArrayAssert.contains(this.sprite, this.game.sprites);
         },
 
         "should set fillStyle": function () {
@@ -46,11 +50,11 @@ YUI().use('test', function (Y) {
         },
 
         "should be added to collisionDetectors if detectCollisions true": function () {
-            var sprite = PONG.sprite('mario', {
+            var sprite = this.game.sprite('mario', {
                 detectCollisions: true
             });
 
-            Y.ArrayAssert.contains(sprite, PONG.collisionDetectors);
+            Y.ArrayAssert.contains(sprite, this.game.collisionDetectors);
         },
 
         "place should set left to be x position": function () {
@@ -180,7 +184,7 @@ YUI().use('test', function (Y) {
         name: 'ball',
 
         setUp: function () {
-            this.ball = PONG.collisionDetectors[0];
+            this.ball = PONG.ball;
             this.ball.x = 53;
             this.ball.left = 53;
             this.ball.y = 30;
@@ -227,14 +231,18 @@ YUI().use('test', function (Y) {
             next1,
             next2;
 
-            next1 = Object.create(PONG.paddle1);
-            next1.y = 10;
+            next1 = {
+                place: PONG.paddle1.place
+            };
+            next1.place(0, 10);
             PONG.paddle1.next = next1;
 
             PONG.paddle1.place(0, 0);
 
-            next2 = Object.create(PONG.paddle2);
-            next2.y = 20;
+            next2 = {
+                place: PONG.paddle2.place
+            };
+            next2.place(0, 20);
             PONG.paddle2.next = next2;
 
             PONG.paddle2.place(568, 0);
@@ -250,82 +258,94 @@ YUI().use('test', function (Y) {
             PONG.ball.draw = draw;
             PONG.paddle1.draw = draw;
             PONG.paddle2.draw = draw;
+
+            PONG.ball.clearCalled = false;
+            PONG.paddle1.clearCalled = false;
+            PONG.paddle2.clearCalled = false;
+
+            PONG.ball.moveCalled = false;
+            PONG.paddle1.moveCalled = false;
+            PONG.paddle2.moveCalled = false;
+
+            PONG.ball.drawCalled = false;
+            PONG.paddle1.drawCalled = false;
+            PONG.paddle2.drawCalled = false;
         },
 
         "should clear the ball": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.ball.clearCalled);
         },
 
         "should move the ball": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.ball.moveCalled);
         },
 
         "should clear paddle1": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.paddle1.clearCalled);
         },
 
         "should clear paddle2": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.paddle2.clearCalled);
         },
 
         "should move paddle1": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.paddle1.moveCalled);
         },
 
         "should move paddle2": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:pre-intersect');
             Y.Assert.isTrue(PONG.paddle2.moveCalled);
         },
 
         "should reverse ball horizontally when it intersects paddle1": function () {
             PONG.ball.xPixelsPerTick = -5;
             PONG.ball.place(5, 0);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.paddle1);
             Y.Assert.areSame(5, PONG.ball.xPixelsPerTick);
         },
 
         "should correct ball when it intersects paddle1": function () {
             PONG.ball.xPixelsPerTick = -5;
             PONG.ball.place(5, 0);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.paddle1);
             Y.Assert.areSame(32, PONG.ball.x);
         },
 
         "should reverse ball horizontally when it intersects paddle2": function () {
             PONG.ball.xPixelsPerTick = 5;
             PONG.ball.place(595, 0);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.paddle2);
             Y.Assert.areSame(-5, PONG.ball.xPixelsPerTick);
         },
 
         "should correct ball when it intersects paddle2": function () {
             PONG.ball.xPixelsPerTick = -5;
             PONG.ball.place(595, 0);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.paddle2);
             Y.Assert.areSame(536, PONG.ball.x);
         },
 
         "should reverse ball vertically when it intersects bottom": function () {
             PONG.ball.yPixelsPerTick = 5;
             PONG.ball.place(0, 595);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.bottom);
             Y.Assert.areSame(-5, PONG.ball.yPixelsPerTick);
         },
 
         "should reverse ball vertically when it intersects top": function () {
             PONG.ball.yPixelsPerTick = -5;
             PONG.ball.place(0, 0);
-            PONG.update();
+            PONG.ball.fire('arnie:collision', PONG.top);
             Y.Assert.areSame(5, PONG.ball.yPixelsPerTick);
         },
 
         "should draw both paddles and the ball": function () {
-            PONG.update();
+            PONG.Y.fire('arnie:post-intersect');
             Y.Assert.isTrue(PONG.paddle1.drawCalled);
             Y.Assert.isTrue(PONG.paddle2.drawCalled);
             Y.Assert.isTrue(PONG.ball.drawCalled);
@@ -359,17 +379,17 @@ YUI().use('test', function (Y) {
         },
 
         "should set ball xPixelsPerTick": function () {
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
             Y.Assert.areSame(10, this.ball.xPixelsPerTick);
         },
 
         "should set ball yPixelsPerTick": function () {
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
             Y.Assert.areSame(11, this.ball.yPixelsPerTick);
         },
 
         "should place the ball": function () {
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
             Y.Assert.areSame(33, this.ball.x);
             Y.Assert.areSame(1, this.ball.y);
         },
@@ -377,7 +397,7 @@ YUI().use('test', function (Y) {
         "should clear ball": function () {
             this.ball.clearCalled = false;
 
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
 
             Y.Assert.isTrue(this.ball.clearCalled);
         },
@@ -386,7 +406,8 @@ YUI().use('test', function (Y) {
             this.paddle1.clearCalled = false;
             this.unplace(this.paddle1);
 
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
+
             Y.Assert.isFalse(this.paddle1.clearCalled);
         },
 
@@ -394,7 +415,8 @@ YUI().use('test', function (Y) {
             this.paddle2.clearCalled = false;
             this.unplace(this.paddle2);
 
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
+
             Y.Assert.isFalse(this.paddle2.clearCalled);
         },
 
@@ -402,7 +424,8 @@ YUI().use('test', function (Y) {
             this.ball.clearCalled = false;
             this.unplace(this.ball);
 
-            PONG.reset();
+            PONG.Y.fire('arnie:reset');
+
             Y.Assert.isFalse(this.ball.clearCalled);
         }
     });
