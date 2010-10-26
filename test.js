@@ -10,7 +10,8 @@ YUI().use('test', function (Y) {
                 x: 40,
                 y: 70,
                 width: 10,
-                height: 30
+                height: 30,
+                fillStyle: 'blue'
             });
 
             this.bat = PONG.sprite('Bat', {
@@ -30,6 +31,10 @@ YUI().use('test', function (Y) {
 
         "should be added to sprites": function () {
             Y.ArrayAssert.contains(this.sprite, PONG.sprites);
+        },
+
+        "should set fillStyle": function () {
+            Y.Assert.areSame('blue', this.sprite.fillStyle);
         },
 
         "should be added to collisionDetectors if detectCollisions true": function () {

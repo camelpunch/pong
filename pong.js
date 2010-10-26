@@ -70,7 +70,7 @@ YUI().use('event-custom', function (Y) {
                 }
             };
 
-            Y.mix(publicSprite, base);
+            publicSprite = Y.merge(publicSprite, base);
 
             // add event handling
             if (publicSprite.detectCollisions) {
