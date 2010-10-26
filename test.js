@@ -1,6 +1,14 @@
 /*global window, YUI, PONG */
 "use strict";
 
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        var F = function () {};
+        F.prototype = o;
+        return new F();
+    };
+}
+
 YUI().use('test', function (Y) {
     var sprite = new Y.Test.Case({
         name: 'sprite',
