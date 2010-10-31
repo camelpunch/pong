@@ -1,4 +1,4 @@
-/*global window, YUI, PONG */
+/*global window, YUI, PONG, ARNIE */
 "use strict";
 
 if (typeof Object.create !== 'function') {
