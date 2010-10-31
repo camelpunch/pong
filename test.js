@@ -12,135 +12,6 @@ if (typeof Object.create !== 'function') {
 YUI().use('test', 'event-custom', function (Y) {
     var canvas = window.document.getElementById('pong'),
 
-    sprite = new Y.Test.Case({
-        name: 'sprite',
-
-        setUp: function () {
-            this.game = ARNIE.game(canvas, Y);
-
-            this.sprite = this.game.sprite('somesprite', {
-                x: 40,
-                y: 70,
-                width: 10,
-                height: 30,
-                fillStyle: 'blue'
-            });
-
-            this.bat = this.game.sprite('Bat', {
-                width: 10,
-                height: 30
-            });
-
-            this.ball = this.game.sprite('Ball', {
-                width: 5,
-                height: 5
-            });
-        },
-
-        "should set name": function () {
-            Y.Assert.areSame('somesprite', this.sprite.name);
-        },
-
-        "should be added to sprites": function () {
-            Y.ArrayAssert.contains(this.sprite, this.game.sprites);
-        },
-
-        "should set fillStyle": function () {
-            Y.Assert.areSame('blue', this.sprite.fillStyle);
-        },
-
-        "should be added to collisionDetectors if detectCollisions true": function () {
-            var sprite = this.game.sprite('mario', {
-                detectCollisions: true
-            });
-
-            Y.ArrayAssert.contains(sprite, this.game.collisionDetectors);
-        },
-
-        "place should set left to be x position": function () {
-            this.sprite.place(50, 50);
-            Y.Assert.areSame(50, this.sprite.left);
-        },
-
-        "place should set right to be x position plus width": function () {
-            this.sprite.place(50, 50);
-            Y.Assert.areSame(60, this.sprite.right);
-        },
-
-        "place should set top to be y position": function () {
-            this.sprite.place(50, 50);
-            Y.Assert.areSame(50, this.sprite.top);
-        },
-
-        "bottom should be y position plus height": function () {
-            this.sprite.place(50, 50);
-            Y.Assert.areSame(80, this.sprite.bottom);
-        },
-
-        "placed should be false when ball hasn't been placed": function () {
-            Y.Assert.isFalse(this.ball.placed());
-        },
-
-        "placed should be true when ball has been placed": function () {
-            this.ball.place(0, 0);
-            Y.Assert.isTrue(this.ball.placed());
-        },
-
-        "intersects should be true when ball LHS over bat RHS": function () {
-            this.bat.place(0, 50);
-            this.ball.place(9, 50);
-
-            Y.assert(this.bat.intersects(this.ball));
-        },
-
-        "intersects should be false when ball RHS not over bat LHS": function () {
-            this.bat.place(0, 50);
-            this.ball.place(11, 50);
-
-            Y.Assert.isFalse(this.bat.intersects(this.ball));
-        },
-
-        "clear should clear within the current dimensions": function () {
-            this.bat.context = Y.Mock();
-
-            Y.Mock.expect(this.bat.context, {
-                method: 'clearRect',
-                args: [this.bat.x, this.bat.y, this.bat.width, this.bat.height]
-            });
-
-            this.bat.clear();
-
-            Y.Mock.verify(this.bat.context);
-        },
-
-        "draw should set the fill style": function () {
-            this.bat.fillStyle = 'green';
-
-            this.bat.context = {
-                fillStyle: undefined,
-                fillRect: function () {
-                }
-            };
-
-            this.bat.draw();
-
-            Y.Assert.areSame('green', this.bat.context.fillStyle);
-        },
-
-        "draw should draw using the current dimensions": function () {
-            this.bat.context = Y.Mock();
-
-            Y.Mock.expect(this.bat.context, {
-                method: 'fillRect',
-                args: [this.bat.x, this.bat.y, this.bat.width, this.bat.height]
-            });
-
-            this.bat.draw();
-
-            Y.Mock.verify(this.bat.context);
-        }
-    }),
-
     paddle = new Y.Test.Case({
         name: 'paddle',
 
@@ -214,21 +85,77 @@ YUI().use('test', 'event-custom', function (Y) {
         }
     }),
 
-    update = new Y.Test.Case({
+    prePostIntersect = new Y.Test.Case({
+        name: "pre- and post-intersect",
+
         setUp: function () {
-            var clear = function () {
-                this.clearCalled = true;
-                return this;
-            },
-            move = function () {
-                this.moveCalled = true;
-                return this;
-            },
-            draw = function () {
-                this.drawCalled = true;
-                return this;
-            },
-            next1,
+            Y.each(['clear', 'move', 'draw'], function (verb) {
+                var func = function () {
+                    this[verb + 'Called'] = true;
+                    return this;
+                };
+
+                PONG.ball[verb] = func;
+                PONG.paddle1[verb] = func;
+                PONG.paddle2[verb] = func;
+
+                PONG.ball[verb + 'Called'] = false;
+                PONG.paddle1[verb + 'Called'] = false;
+                PONG.paddle2[verb + 'Called'] = false;
+            });
+        },
+
+        "should clear the ball on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.ball.clearCalled);
+        },
+
+        "should move the ball on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.ball.moveCalled);
+        },
+
+        "should clear paddle1 on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.paddle1.clearCalled);
+        },
+
+        "should clear paddle2 on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.paddle2.clearCalled);
+        },
+
+        "should move paddle1 on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.paddle1.moveCalled);
+        },
+
+        "should move paddle2 on pre": function () {
+            PONG.Y.fire('arnie:pre-intersect');
+            Y.Assert.isTrue(PONG.paddle2.moveCalled);
+        },
+
+        "should draw the ball on post": function () {
+            PONG.Y.fire('arnie:post-intersect');
+            Y.Assert.isTrue(PONG.ball.drawCalled);
+        },
+
+        "should draw paddle1 on post": function () {
+            PONG.Y.fire('arnie:post-intersect');
+            Y.Assert.isTrue(PONG.paddle1.drawCalled);
+        },
+
+        "should draw paddle2 on post": function () {
+            PONG.Y.fire('arnie:post-intersect');
+            Y.Assert.isTrue(PONG.paddle2.drawCalled);
+        }
+    }),
+
+    collision = new Y.Test.Case({
+        name: "collision",
+
+        setUp: function () {
+            var next1,
             next2;
 
             next1 = {
@@ -246,60 +173,6 @@ YUI().use('test', 'event-custom', function (Y) {
             PONG.paddle2.next = next2;
 
             PONG.paddle2.place(568, 0);
-
-            PONG.ball.clear = clear;
-            PONG.paddle1.clear = clear;
-            PONG.paddle2.clear = clear;
-
-            PONG.ball.move = move;
-            PONG.paddle1.move = move;
-            PONG.paddle2.move = move;
-
-            PONG.ball.draw = draw;
-            PONG.paddle1.draw = draw;
-            PONG.paddle2.draw = draw;
-
-            PONG.ball.clearCalled = false;
-            PONG.paddle1.clearCalled = false;
-            PONG.paddle2.clearCalled = false;
-
-            PONG.ball.moveCalled = false;
-            PONG.paddle1.moveCalled = false;
-            PONG.paddle2.moveCalled = false;
-
-            PONG.ball.drawCalled = false;
-            PONG.paddle1.drawCalled = false;
-            PONG.paddle2.drawCalled = false;
-        },
-
-        "should clear the ball": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.ball.clearCalled);
-        },
-
-        "should move the ball": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.ball.moveCalled);
-        },
-
-        "should clear paddle1": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.paddle1.clearCalled);
-        },
-
-        "should clear paddle2": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.paddle2.clearCalled);
-        },
-
-        "should move paddle1": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.paddle1.moveCalled);
-        },
-
-        "should move paddle2": function () {
-            PONG.Y.fire('arnie:pre-intersect');
-            Y.Assert.isTrue(PONG.paddle2.moveCalled);
         },
 
         "should reverse ball horizontally when it intersects paddle1": function () {
@@ -342,17 +215,12 @@ YUI().use('test', 'event-custom', function (Y) {
             PONG.ball.place(0, 0);
             PONG.ball.fire('arnie:collision', PONG.top);
             Y.Assert.areSame(5, PONG.ball.yPixelsPerTick);
-        },
-
-        "should draw both paddles and the ball": function () {
-            PONG.Y.fire('arnie:post-intersect');
-            Y.Assert.isTrue(PONG.paddle1.drawCalled);
-            Y.Assert.isTrue(PONG.paddle2.drawCalled);
-            Y.Assert.isTrue(PONG.ball.drawCalled);
         }
     }),
         
     reset = new Y.Test.Case({
+        name: "reset",
+
         setUp: function () {
             this.paddle1 = PONG.paddle1;
             this.paddle1.place(0, 50);
@@ -432,12 +300,12 @@ YUI().use('test', 'event-custom', function (Y) {
 
     Y.Test.Runner.add(ball);
     Y.Test.Runner.add(paddle);
-    Y.Test.Runner.add(sprite);
 
     // dirty cases that override functions in lieu of finding a different
     // mocking framework / refactoring
     Y.Test.Runner.add(reset);
-    Y.Test.Runner.add(update);
+    Y.Test.Runner.add(prePostIntersect);
+    Y.Test.Runner.add(collision);
 
     Y.Test.Runner.run();
 });

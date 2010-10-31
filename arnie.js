@@ -104,7 +104,8 @@ window.ARNIE = (function () {
             collisionDetectors: collisionDetectors,
             sprite: sprite,
             sprites: sprites,
-            reset: reset
+            reset: reset,
+            update: update
         };
     };
 
