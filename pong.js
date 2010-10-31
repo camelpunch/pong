@@ -82,14 +82,19 @@ YUI().use('node', 'event-custom', function (Y) {
         });
 
         ball.on('arnie:collision', function (other) {
-            if (other === paddle1) {
+            switch (other) {
+            case paddle1:
                 this.reverseX();
                 this.place(other.right, this.y);
-            } else if (other === paddle2) {
+                break;
+            case paddle2:
                 this.reverseX();
                 this.place(other.left - this.width, this.y);
-            } else if (other === top || other === bottom) {
+                break;
+            case top:
+            case bottom:
                 this.reverseY();
+                break;
             }
         });
 
