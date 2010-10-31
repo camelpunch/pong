@@ -1,6 +1,19 @@
 body {
   text-align:center
 }
+table {
+  margin:0 auto;
+  width:800px
+}
+th {
+  width:400px
+}
+th.player1 {
+  color:blue
+}
+th.player2 {
+  color:red
+}
 canvas {
   margin:0 auto;
   border:1px solid #f00;

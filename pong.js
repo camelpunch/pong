@@ -6,6 +6,14 @@ YUI().use('node', 'event-custom', function (Y) {
         var canvas = window.document.getElementById('pong'),
         game = ARNIE.game(canvas, Y),
 
+        player1 = {
+            score: 0
+        },
+
+        player2 = {
+            score: 0
+        },
+
         ball = game.sprite('ball', {
             detectCollisions: true,
 
@@ -62,7 +70,30 @@ YUI().use('node', 'event-custom', function (Y) {
         bottom = game.sprite('bottom', {
             width: canvas.width,
             height: 1
-        });
+        }),
+        
+        left = game.sprite('left', {
+            width: 1,
+            height: canvas.height
+        }),
+
+        right = game.sprite('right', {
+            width: 1,
+            height: canvas.height
+        }),
+            
+        startRound = function () {
+            if (ball.placed()) {
+                ball.clear();
+            }
+            ball.place(paddle1.right + 1, 1);
+
+            ball.xPixelsPerTick = 10;
+            ball.yPixelsPerTick = 11;
+
+            Y.one('#score_player1').setContent(player1.score);
+            Y.one('#score_player2').setContent(player2.score);
+        };
 
         paddle1.place(0, 0);
         paddle2.fillStyle = 'red';
@@ -73,6 +104,8 @@ YUI().use('node', 'event-custom', function (Y) {
 
         top.place(0, 0);
         bottom.place(0, canvas.height);
+        left.place(0, 0);
+        right.place(canvas.width, 0);
 
         // events
         Y.on('arnie:pre-intersect', function () {
@@ -91,6 +124,14 @@ YUI().use('node', 'event-custom', function (Y) {
                 this.reverseX();
                 this.place(other.left - this.width, this.y);
                 break;
+            case left:
+                player2.score += 1;
+                startRound();
+                break;
+            case right:
+                player1.score += 1;
+                startRound();
+                break;
             case top:
             case bottom:
                 this.reverseY();
@@ -105,13 +146,7 @@ YUI().use('node', 'event-custom', function (Y) {
         });
 
         Y.on('arnie:reset', function () {
-            if (ball.placed()) {
-                ball.clear();
-            }
-            ball.place(paddle1.right + 1, 1);
-
-            ball.xPixelsPerTick = 10;
-            ball.yPixelsPerTick = 11;
+            startRound();
         });
 
         Y.on('mousemove', function (e) {
@@ -123,11 +158,14 @@ YUI().use('node', 'event-custom', function (Y) {
             // objects used privately, also available publicly
             Y: Y,
             game: game,
+            startRound: startRound,
             ball: ball,
             paddle1: paddle1,
             paddle2: paddle2,
             bottom: bottom,
-            top: top
+            top: top,
+            left: left,
+            right: right
         };
     }());
 

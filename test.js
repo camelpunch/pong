@@ -173,6 +173,8 @@ YUI().use('test', 'event-custom', function (Y) {
             PONG.paddle2.next = next2;
 
             PONG.paddle2.place(568, 0);
+
+            PONG.startRound();
         },
 
         "should reverse ball horizontally when it intersects paddle1": function () {
@@ -205,16 +207,26 @@ YUI().use('test', 'event-custom', function (Y) {
 
         "should reverse ball vertically when it intersects bottom": function () {
             PONG.ball.yPixelsPerTick = 5;
-            PONG.ball.place(0, 595);
+            PONG.ball.place(10, 595);
             PONG.ball.fire('arnie:collision', PONG.bottom);
             Y.Assert.areSame(-5, PONG.ball.yPixelsPerTick);
         },
 
         "should reverse ball vertically when it intersects top": function () {
             PONG.ball.yPixelsPerTick = -5;
-            PONG.ball.place(0, 0);
+            PONG.ball.place(20, 0);
             PONG.ball.fire('arnie:collision', PONG.top);
             Y.Assert.areSame(5, PONG.ball.yPixelsPerTick);
+        },
+
+        "should increase player 1 score when when ball intersects right": function () {
+            PONG.ball.fire('arnie:collision', PONG.right);
+            Y.Assert.areSame('1', window.document.getElementById('score_player1').innerHTML);
+        },
+
+        "should increase player 2 score when when ball intersects left": function () {
+            PONG.ball.fire('arnie:collision', PONG.left);
+            Y.Assert.areSame('1', window.document.getElementById('score_player2').innerHTML);
         }
     }),
         
@@ -244,6 +256,12 @@ YUI().use('test', 'event-custom', function (Y) {
                 delete sprite.top;
                 delete sprite.bottom;
             };
+        },
+
+        "should reset scores": function () {
+            PONG.Y.fire('arnie:reset');
+            Y.Assert.areSame('0', window.document.getElementById('score_player1').innerHTML);
+            Y.Assert.areSame('0', window.document.getElementById('score_player2').innerHTML);
         },
 
         "should set ball xPixelsPerTick": function () {
