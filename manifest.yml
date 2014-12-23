@@ -1,0 +1,7 @@
+---
+applications:
+  - name: pong
+    host: pong
+    domain: andrewbruce.net
+    memory: 32M
+    instances: 1
